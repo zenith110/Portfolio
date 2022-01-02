@@ -42,6 +42,11 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AccessCode struct {
+		AllowedAccess func(childComplexity int) int
+		StatusCode    func(childComplexity int) int
+	}
+
 	Article struct {
 		Author      func(childComplexity int) int
 		Content     func(childComplexity int) int
@@ -74,6 +79,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateArticle func(childComplexity int, input *model.NewArticle) int
+		Login         func(childComplexity int, input *model.LoginUser) int
 	}
 
 	Query struct {
@@ -84,6 +90,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateArticle(ctx context.Context, input *model.NewArticle) (*model.Article, error)
+	Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error)
 }
 type QueryResolver interface {
 	Article(ctx context.Context, name string) (*model.Article, error)
@@ -104,6 +111,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AccessCode.allowedAccess":
+		if e.complexity.AccessCode.AllowedAccess == nil {
+			break
+		}
+
+		return e.complexity.AccessCode.AllowedAccess(childComplexity), true
+
+	case "AccessCode.statusCode":
+		if e.complexity.AccessCode.StatusCode == nil {
+			break
+		}
+
+		return e.complexity.AccessCode.StatusCode(childComplexity), true
 
 	case "Article.author":
 		if e.complexity.Article.Author == nil {
@@ -201,6 +222,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateArticle(childComplexity, args["input"].(*model.NewArticle)), true
 
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(*model.LoginUser)), true
+
 	case "Query.article":
 		if e.complexity.Query.Article == nil {
 			break
@@ -294,6 +327,11 @@ type Query {
 }
 type Mutation{
     createArticle(input: NewArticle): Article!
+    login(input: LoginUser): AccessCode
+}
+type AccessCode{
+    statusCode: ID!
+    allowedAccess: Boolean!
 }
 type Image{
     url: String!
@@ -312,6 +350,10 @@ type Content{
 input NewArticle{
     name: String!
     content: String!
+}
+input LoginUser{
+    username: String!
+    password: String!
 }
 type Article{
   name: String!
@@ -342,6 +384,21 @@ func (ec *executionContext) field_Mutation_createArticle_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalONewArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐNewArticle(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.LoginUser
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOLoginUser2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐLoginUser(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -417,6 +474,76 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AccessCode_statusCode(ctx context.Context, field graphql.CollectedField, obj *model.AccessCode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessCode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StatusCode, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _AccessCode_allowedAccess(ctx context.Context, field graphql.CollectedField, obj *model.AccessCode) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AccessCode",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AllowedAccess, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _Article_name(ctx context.Context, field graphql.CollectedField, obj *model.Article) (ret graphql.Marshaler) {
 	defer func() {
@@ -878,6 +1005,45 @@ func (ec *executionContext) _Mutation_createArticle(ctx context.Context, field g
 	res := resTmp.(*model.Article)
 	fc.Result = res
 	return ec.marshalNArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_login_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, args["input"].(*model.LoginUser))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.AccessCode)
+	fc.Result = res
+	return ec.marshalOAccessCode2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐAccessCode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_article(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2144,6 +2310,37 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputLoginUser(ctx context.Context, obj interface{}) (model.LoginUser, error) {
+	var it model.LoginUser
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "username":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("username"))
+			it.Username, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj interface{}) (model.NewArticle, error) {
 	var it model.NewArticle
 	asMap := map[string]interface{}{}
@@ -2182,6 +2379,38 @@ func (ec *executionContext) unmarshalInputNewArticle(ctx context.Context, obj in
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var accessCodeImplementors = []string{"AccessCode"}
+
+func (ec *executionContext) _AccessCode(ctx context.Context, sel ast.SelectionSet, obj *model.AccessCode) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, accessCodeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AccessCode")
+		case "statusCode":
+			out.Values[i] = ec._AccessCode_statusCode(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "allowedAccess":
+			out.Values[i] = ec._AccessCode_allowedAccess(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var articleImplementors = []string{"Article"}
 
@@ -2395,6 +2624,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "login":
+			out.Values[i] = ec._Mutation_login(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2851,6 +3082,21 @@ func (ec *executionContext) marshalNContent2ᚕᚖgithubᚗcomᚋzenith110ᚋpor
 	return ret
 }
 
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalID(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNImage2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐImage(ctx context.Context, sel ast.SelectionSet, v []*model.Image) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -3199,6 +3445,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalOAccessCode2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐAccessCode(ctx context.Context, sel ast.SelectionSet, v *model.AccessCode) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AccessCode(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalOArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx context.Context, sel ast.SelectionSet, v *model.Article) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -3263,6 +3516,14 @@ func (ec *executionContext) marshalOItalizedText2ᚖgithubᚗcomᚋzenith110ᚋp
 		return graphql.Null
 	}
 	return ec._ItalizedText(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOLoginUser2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐLoginUser(ctx context.Context, v interface{}) (*model.LoginUser, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLoginUser(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalONewArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐNewArticle(ctx context.Context, v interface{}) (*model.NewArticle, error) {

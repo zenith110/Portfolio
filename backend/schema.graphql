@@ -8,6 +8,11 @@ type Query {
 }
 type Mutation{
     createArticle(input: NewArticle): Article!
+    login(input: LoginUser): AccessCode
+}
+type AccessCode{
+    statusCode: ID!
+    allowedAccess: Boolean!
 }
 type Image{
     url: String!
@@ -26,6 +31,10 @@ type Content{
 input NewArticle{
     name: String!
     content: String!
+}
+input LoginUser{
+    username: String!
+    password: String!
 }
 type Article{
   name: String!

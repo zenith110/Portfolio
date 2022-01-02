@@ -2,6 +2,11 @@
 
 package model
 
+type AccessCode struct {
+	StatusCode    string `json:"statusCode"`
+	AllowedAccess bool   `json:"allowedAccess"`
+}
+
 type Article struct {
 	Name        string     `json:"name"`
 	Author      string     `json:"author"`
@@ -30,6 +35,11 @@ type Image struct {
 
 type ItalizedText struct {
 	Text string `json:"text"`
+}
+
+type LoginUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type NewArticle struct {

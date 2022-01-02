@@ -6,12 +6,19 @@ package graph
 import (
 	"context"
 	"fmt"
-
 	"github.com/zenith110/portfilo/graph/generated"
 	"github.com/zenith110/portfilo/graph/model"
+	"github.com/zenith110/portfilo/graph/routes"
+	"os"
 )
 
+var databaseUri = os.Getenv("DATABASEURI")
+
 func (r *mutationResolver) CreateArticle(ctx context.Context, input *model.NewArticle) (*model.Article, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -20,7 +27,7 @@ func (r *queryResolver) Article(ctx context.Context, name string) (*model.Articl
 }
 
 func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
-	panic(fmt.Errorf("not implemented"))
+	routes.FetchArticles(databaseUri)
 }
 
 // Mutation returns generated.MutationResolver implementation.
