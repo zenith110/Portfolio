@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    user: '104'
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
