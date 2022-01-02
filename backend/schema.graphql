@@ -1,0 +1,43 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+type Query {
+    article(name: String!): Article
+    articles: Articles
+}
+type Mutation{
+    createArticle(input: NewArticle): Article!
+}
+type Image{
+    url: String!
+}
+type BoldText{
+    text: String!
+}
+type ItalizedText{
+    text: String!
+}
+type Content{
+    images: [Image]!
+    boldTexts: [BoldText]!
+    italizedTexts: [ItalizedText]!
+}
+input NewArticle{
+    name: String!
+    content: String!
+}
+type Article{
+  name: String!
+  author: String!
+  content: [Content]!
+  dateWritten: String!
+  url: String!
+}
+type Articles{
+    articles: [Article]!
+}
+
+
+
+

@@ -25,3 +25,5 @@ prod-detached:
 #===============================================#
 #     Application specific commands #
 #===============================================#
+generate-schema: # Runs generate schema command from go makefile
+	$(MAKE) -C backend/ generate-schema
