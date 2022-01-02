@@ -9,9 +9,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-func FetchArticles(databaseUri string) {
+func FetchArticles(databaseUri string, dbName string, dbCollection string) {
 	// Create a new client and connect to the server
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(databaseUri))
 	if err != nil {
 		panic(err)
 	}
@@ -20,9 +20,6 @@ func FetchArticles(databaseUri string) {
 			panic(err)
 		}
 	}()
-	// Ping the primary
-	if err := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected and pinged.")
+	db := client.Database(dbName).Collection(dbCollection)
+	findOptions := options.Find()
 }

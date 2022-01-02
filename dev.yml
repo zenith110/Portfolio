@@ -12,3 +12,16 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+  graphql:
+    image: zenith110/portfolio-graphql
+    build:
+      context: ./backend
+      dockerfile: dev.dockerfile
+    container_name: graphql
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    env_file:
+      - .env
