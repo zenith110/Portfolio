@@ -31,7 +31,8 @@ func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
 }
 
 func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjects, error) {
-	panic(fmt.Errorf("not implemented"))
+	github, err := routes.FetchProjects(githubUser)
+	return github, err
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -53,3 +54,4 @@ var databaseUri = os.Getenv("DATABASEURI")
 var dbName = os.Getenv("DBNAME")
 var dbCollection = os.Getenv("DBCOLLECTION")
 var githubToken = os.Getenv("GITHUB")
+var githubUser = os.Getenv("GITHUBUSER")
