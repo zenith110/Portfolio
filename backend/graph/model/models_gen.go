@@ -31,6 +31,10 @@ type Content struct {
 	Content string   `json:"content"`
 }
 
+type GithubProjects struct {
+	Projects []*Project `json:"projects"`
+}
+
 type Image struct {
 	URL string `json:"url"`
 }
@@ -43,4 +47,16 @@ type LoginUser struct {
 type NewArticle struct {
 	Name    string `json:"name"`
 	Content string `json:"content"`
+}
+
+type Project struct {
+	Name   string `json:"name"`
+	Tags   []*Tag `json:"tags"`
+	Link   string `json:"link"`
+	Readme string `json:"readme"`
+}
+
+type Tag struct {
+	Language string `json:"language"`
+	Image    string `json:"image"`
 }

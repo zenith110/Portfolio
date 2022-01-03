@@ -30,6 +30,10 @@ func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
 	return articles, err
 }
 
+func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjects, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 
@@ -48,3 +52,4 @@ type queryResolver struct{ *Resolver }
 var databaseUri = os.Getenv("DATABASEURI")
 var dbName = os.Getenv("DBNAME")
 var dbCollection = os.Getenv("DBCOLLECTION")
+var githubToken = os.Getenv("GITHUB")

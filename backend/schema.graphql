@@ -5,6 +5,7 @@ schema {
 type Query {
     article(name: String!): Article
     articles: Articles
+    githubProjects: GithubProjects
 }
 type Mutation{
     createArticle(input: NewArticle): Article!
@@ -47,7 +48,19 @@ type Articles{
     articles: [Article]!
     total: Int!
 }
-
+type Tag{
+    language: String!
+    image: String!
+}
+type Project{
+    name: String!
+    tags: [Tag]!
+    link: String!
+    readme: String!
+}
+type GithubProjects{
+    projects: [Project]!
+}
 
 
 
