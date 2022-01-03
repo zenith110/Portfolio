@@ -49,7 +49,7 @@ type ComplexityRoot struct {
 
 	Article struct {
 		Author      func(childComplexity int) int
-		Content     func(childComplexity int) int
+		ContentData func(childComplexity int) int
 		DateWritten func(childComplexity int) int
 		Name        func(childComplexity int) int
 		URL         func(childComplexity int) int
@@ -60,22 +60,19 @@ type ComplexityRoot struct {
 		Total    func(childComplexity int) int
 	}
 
-	BoldText struct {
-		Text func(childComplexity int) int
+	Author struct {
+		Name    func(childComplexity int) int
+		Picture func(childComplexity int) int
+		Profile func(childComplexity int) int
 	}
 
 	Content struct {
-		BoldTexts     func(childComplexity int) int
-		Images        func(childComplexity int) int
-		ItalizedTexts func(childComplexity int) int
+		Content func(childComplexity int) int
+		Images  func(childComplexity int) int
 	}
 
 	Image struct {
 		URL func(childComplexity int) int
-	}
-
-	ItalizedText struct {
-		Text func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -134,12 +131,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Article.Author(childComplexity), true
 
-	case "Article.content":
-		if e.complexity.Article.Content == nil {
+	case "Article.contentData":
+		if e.complexity.Article.ContentData == nil {
 			break
 		}
 
-		return e.complexity.Article.Content(childComplexity), true
+		return e.complexity.Article.ContentData(childComplexity), true
 
 	case "Article.dateWritten":
 		if e.complexity.Article.DateWritten == nil {
@@ -176,19 +173,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Articles.Total(childComplexity), true
 
-	case "BoldText.text":
-		if e.complexity.BoldText.Text == nil {
+	case "Author.name":
+		if e.complexity.Author.Name == nil {
 			break
 		}
 
-		return e.complexity.BoldText.Text(childComplexity), true
+		return e.complexity.Author.Name(childComplexity), true
 
-	case "Content.boldTexts":
-		if e.complexity.Content.BoldTexts == nil {
+	case "Author.picture":
+		if e.complexity.Author.Picture == nil {
 			break
 		}
 
-		return e.complexity.Content.BoldTexts(childComplexity), true
+		return e.complexity.Author.Picture(childComplexity), true
+
+	case "Author.profile":
+		if e.complexity.Author.Profile == nil {
+			break
+		}
+
+		return e.complexity.Author.Profile(childComplexity), true
+
+	case "Content.content":
+		if e.complexity.Content.Content == nil {
+			break
+		}
+
+		return e.complexity.Content.Content(childComplexity), true
 
 	case "Content.images":
 		if e.complexity.Content.Images == nil {
@@ -197,26 +208,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Content.Images(childComplexity), true
 
-	case "Content.italizedTexts":
-		if e.complexity.Content.ItalizedTexts == nil {
-			break
-		}
-
-		return e.complexity.Content.ItalizedTexts(childComplexity), true
-
 	case "Image.url":
 		if e.complexity.Image.URL == nil {
 			break
 		}
 
 		return e.complexity.Image.URL(childComplexity), true
-
-	case "ItalizedText.text":
-		if e.complexity.ItalizedText.Text == nil {
-			break
-		}
-
-		return e.complexity.ItalizedText.Text(childComplexity), true
 
 	case "Mutation.createArticle":
 		if e.complexity.Mutation.CreateArticle == nil {
@@ -344,16 +341,10 @@ type AccessCode{
 type Image{
     url: String!
 }
-type BoldText{
-    text: String!
-}
-type ItalizedText{
-    text: String!
-}
+
 type Content{
     images: [Image]!
-    boldTexts: [BoldText]!
-    italizedTexts: [ItalizedText]!
+    content: String!
 }
 input NewArticle{
     name: String!
@@ -363,10 +354,15 @@ input LoginUser{
     username: String!
     password: String!
 }
+type Author{
+    name: String!
+    profile: String!
+    picture: String!
+}
 type Article{
   name: String!
-  author: String!
-  content: [Content]!
+  author: Author!
+  contentData: [Content]!
   dateWritten: String!
   url: String!
 }
@@ -620,12 +616,12 @@ func (ec *executionContext) _Article_author(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.Author)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNAuthor2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐAuthor(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Article_content(ctx context.Context, field graphql.CollectedField, obj *model.Article) (ret graphql.Marshaler) {
+func (ec *executionContext) _Article_contentData(ctx context.Context, field graphql.CollectedField, obj *model.Article) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -643,7 +639,7 @@ func (ec *executionContext) _Article_content(ctx context.Context, field graphql.
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Content, nil
+		return obj.ContentData, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -800,7 +796,7 @@ func (ec *executionContext) _Articles_total(ctx context.Context, field graphql.C
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _BoldText_text(ctx context.Context, field graphql.CollectedField, obj *model.BoldText) (ret graphql.Marshaler) {
+func (ec *executionContext) _Author_name(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -808,7 +804,7 @@ func (ec *executionContext) _BoldText_text(ctx context.Context, field graphql.Co
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "BoldText",
+		Object:     "Author",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -818,7 +814,77 @@ func (ec *executionContext) _BoldText_text(ctx context.Context, field graphql.Co
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Author_profile(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Profile, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Author_picture(ctx context.Context, field graphql.CollectedField, obj *model.Author) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Author",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Picture, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -870,7 +936,7 @@ func (ec *executionContext) _Content_images(ctx context.Context, field graphql.C
 	return ec.marshalNImage2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐImage(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Content_boldTexts(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
+func (ec *executionContext) _Content_content(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -888,7 +954,7 @@ func (ec *executionContext) _Content_boldTexts(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.BoldTexts, nil
+		return obj.Content, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -900,44 +966,9 @@ func (ec *executionContext) _Content_boldTexts(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*model.BoldText)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNBoldText2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐBoldText(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Content_italizedTexts(ctx context.Context, field graphql.CollectedField, obj *model.Content) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Content",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ItalizedTexts, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ItalizedText)
-	fc.Result = res
-	return ec.marshalNItalizedText2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐItalizedText(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Image_url(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
@@ -959,41 +990,6 @@ func (ec *executionContext) _Image_url(ctx context.Context, field graphql.Collec
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _ItalizedText_text(ctx context.Context, field graphql.CollectedField, obj *model.ItalizedText) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "ItalizedText",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Text, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2478,8 +2474,8 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "content":
-			out.Values[i] = ec._Article_content(ctx, field, obj)
+		case "contentData":
+			out.Values[i] = ec._Article_contentData(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2536,19 +2532,29 @@ func (ec *executionContext) _Articles(ctx context.Context, sel ast.SelectionSet,
 	return out
 }
 
-var boldTextImplementors = []string{"BoldText"}
+var authorImplementors = []string{"Author"}
 
-func (ec *executionContext) _BoldText(ctx context.Context, sel ast.SelectionSet, obj *model.BoldText) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, boldTextImplementors)
+func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, obj *model.Author) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, authorImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("BoldText")
-		case "text":
-			out.Values[i] = ec._BoldText_text(ctx, field, obj)
+			out.Values[i] = graphql.MarshalString("Author")
+		case "name":
+			out.Values[i] = ec._Author_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "profile":
+			out.Values[i] = ec._Author_profile(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "picture":
+			out.Values[i] = ec._Author_picture(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2579,13 +2585,8 @@ func (ec *executionContext) _Content(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "boldTexts":
-			out.Values[i] = ec._Content_boldTexts(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "italizedTexts":
-			out.Values[i] = ec._Content_italizedTexts(ctx, field, obj)
+		case "content":
+			out.Values[i] = ec._Content_content(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2613,33 +2614,6 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 			out.Values[i] = graphql.MarshalString("Image")
 		case "url":
 			out.Values[i] = ec._Image_url(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var italizedTextImplementors = []string{"ItalizedText"}
-
-func (ec *executionContext) _ItalizedText(ctx context.Context, sel ast.SelectionSet, obj *model.ItalizedText) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, italizedTextImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ItalizedText")
-		case "text":
-			out.Values[i] = ec._ItalizedText_text(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3041,42 +3015,14 @@ func (ec *executionContext) marshalNArticle2ᚖgithubᚗcomᚋzenith110ᚋportfi
 	return ec._Article(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNBoldText2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐBoldText(ctx context.Context, sel ast.SelectionSet, v []*model.BoldText) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
+func (ec *executionContext) marshalNAuthor2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐAuthor(ctx context.Context, sel ast.SelectionSet, v *model.Author) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
 	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOBoldText2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐBoldText(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
+	return ec._Author(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
@@ -3198,44 +3144,6 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNItalizedText2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐItalizedText(ctx context.Context, sel ast.SelectionSet, v []*model.ItalizedText) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOItalizedText2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐItalizedText(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3531,13 +3439,6 @@ func (ec *executionContext) marshalOArticles2ᚖgithubᚗcomᚋzenith110ᚋportf
 	return ec._Articles(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOBoldText2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐBoldText(ctx context.Context, sel ast.SelectionSet, v *model.BoldText) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._BoldText(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3574,13 +3475,6 @@ func (ec *executionContext) marshalOImage2ᚖgithubᚗcomᚋzenith110ᚋportfilo
 		return graphql.Null
 	}
 	return ec._Image(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOItalizedText2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐItalizedText(ctx context.Context, sel ast.SelectionSet, v *model.ItalizedText) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ItalizedText(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOLoginUser2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐLoginUser(ctx context.Context, v interface{}) (*model.LoginUser, error) {

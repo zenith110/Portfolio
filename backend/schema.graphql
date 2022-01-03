@@ -17,16 +17,10 @@ type AccessCode{
 type Image{
     url: String!
 }
-type BoldText{
-    text: String!
-}
-type ItalizedText{
-    text: String!
-}
+
 type Content{
     images: [Image]!
-    boldTexts: [BoldText]!
-    italizedTexts: [ItalizedText]!
+    content: String!
 }
 input NewArticle{
     name: String!
@@ -36,10 +30,15 @@ input LoginUser{
     username: String!
     password: String!
 }
+type Author{
+    name: String!
+    profile: String!
+    picture: String!
+}
 type Article{
   name: String!
-  author: String!
-  content: [Content]!
+  author: Author!
+  contentData: [Content]!
   dateWritten: String!
   url: String!
 }

@@ -9,8 +9,8 @@ type AccessCode struct {
 
 type Article struct {
 	Name        string     `json:"name"`
-	Author      string     `json:"author"`
-	Content     []*Content `json:"content"`
+	Author      *Author    `json:"author"`
+	ContentData []*Content `json:"contentData"`
 	DateWritten string     `json:"dateWritten"`
 	URL         string     `json:"url"`
 }
@@ -20,22 +20,19 @@ type Articles struct {
 	Total    int        `json:"total"`
 }
 
-type BoldText struct {
-	Text string `json:"text"`
+type Author struct {
+	Name    string `json:"name"`
+	Profile string `json:"profile"`
+	Picture string `json:"picture"`
 }
 
 type Content struct {
-	Images        []*Image        `json:"images"`
-	BoldTexts     []*BoldText     `json:"boldTexts"`
-	ItalizedTexts []*ItalizedText `json:"italizedTexts"`
+	Images  []*Image `json:"images"`
+	Content string   `json:"content"`
 }
 
 type Image struct {
 	URL string `json:"url"`
-}
-
-type ItalizedText struct {
-	Text string `json:"text"`
 }
 
 type LoginUser struct {

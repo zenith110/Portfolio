@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/zenith110/portfilo/graph/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 )
 
 func FetchArticles(databaseUri string, dbName string, dbCollection string) (*model.Articles, error) {
@@ -39,7 +40,7 @@ func FetchArticles(databaseUri string, dbName string, dbCollection string) (*mod
 			log.Fatal(err)
 		}
 
-		articlesStorage = append(articlesStorage, article)
+		articlesStorage = append(articlesStorage, &article)
 		totalArticles += 1
 	}
 	var articles = model.Articles{Articles: articlesStorage, Total: totalArticles}
