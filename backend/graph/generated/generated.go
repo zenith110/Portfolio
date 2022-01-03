@@ -57,6 +57,7 @@ type ComplexityRoot struct {
 
 	Articles struct {
 		Articles func(childComplexity int) int
+		Total    func(childComplexity int) int
 	}
 
 	BoldText struct {
@@ -167,6 +168,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Articles.Articles(childComplexity), true
+
+	case "Articles.total":
+		if e.complexity.Articles.Total == nil {
+			break
+		}
+
+		return e.complexity.Articles.Total(childComplexity), true
 
 	case "BoldText.text":
 		if e.complexity.BoldText.Text == nil {
@@ -362,8 +370,10 @@ type Article{
   dateWritten: String!
   url: String!
 }
+
 type Articles{
     articles: [Article]!
+    total: Int!
 }
 
 
@@ -753,6 +763,41 @@ func (ec *executionContext) _Articles_articles(ctx context.Context, field graphq
 	res := resTmp.([]*model.Article)
 	fc.Result = res
 	return ec.marshalNArticle2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Articles_total(ctx context.Context, field graphql.CollectedField, obj *model.Articles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Articles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _BoldText_text(ctx context.Context, field graphql.CollectedField, obj *model.BoldText) (ret graphql.Marshaler) {
@@ -2475,6 +2520,11 @@ func (ec *executionContext) _Articles(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "total":
+			out.Values[i] = ec._Articles_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3133,6 +3183,21 @@ func (ec *executionContext) marshalNImage2ᚕᚖgithubᚗcomᚋzenith110ᚋportf
 	wg.Wait()
 
 	return ret
+}
+
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalNItalizedText2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐItalizedText(ctx context.Context, sel ast.SelectionSet, v []*model.ItalizedText) graphql.Marshaler {

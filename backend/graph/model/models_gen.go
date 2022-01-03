@@ -17,6 +17,7 @@ type Article struct {
 
 type Articles struct {
 	Articles []*Article `json:"articles"`
+	Total    int        `json:"total"`
 }
 
 type BoldText struct {

@@ -6,13 +6,12 @@ package graph
 import (
 	"context"
 	"fmt"
+	"os"
+
 	"github.com/zenith110/portfilo/graph/generated"
 	"github.com/zenith110/portfilo/graph/model"
 	"github.com/zenith110/portfilo/graph/routes"
-	"os"
 )
-
-var databaseUri = os.Getenv("DATABASEURI")
 
 func (r *mutationResolver) CreateArticle(ctx context.Context, input *model.NewArticle) (*model.Article, error) {
 	panic(fmt.Errorf("not implemented"))
@@ -27,7 +26,8 @@ func (r *queryResolver) Article(ctx context.Context, name string) (*model.Articl
 }
 
 func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
-	routes.FetchArticles(databaseUri)
+	articles, err := routes.FetchArticles(databaseUri, dbName, dbCollection)
+	return articles, err
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -38,3 +38,13 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+var databaseUri = os.Getenv("DATABASEURI")
+var dbName = os.Getenv("DBNAME")
+var dbCollection = os.Getenv("DBCOLLECTION")
