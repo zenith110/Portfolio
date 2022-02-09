@@ -1,11 +1,11 @@
-version: '3'
+version: "3"
 
 services:
   grafana:
     image: grafana/grafana:latest
     ports:
       - 3000:3000
-    user: '104'
+    user: "104"
   mongo:
     image: mongo
     restart: always
@@ -23,5 +23,22 @@ services:
     restart: unless-stopped
     ports:
       - "8443:8443"
-    env_file:
-      - .env
+    # env_file:
+    #   - .env
+  emailcow:
+    image: mailcow/sogo
+  teleport:
+    image: quay.io/gravitational/teleport:8
+    container_name: teleport
+    entrypoint: /bin/sh
+    hostname: luna.teleport
+    command: -c "config"
+    ports:
+      - "3023:3023"
+      - "3024:3024"
+      - "3025:3025"
+      - "443:443"
+    volumes:
+      - ./config:/etc/teleport
+      - ./data:/var/lib/teleport
+      - ./certs:/mnt/shared/certs
