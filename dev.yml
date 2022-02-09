@@ -1,44 +1,61 @@
 version: "3"
 
 services:
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - 3000:3000
-    user: "104"
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-  graphql:
-    image: zenith110/portfolio-graphql
-    build:
-      context: ./backend
-      dockerfile: dev.dockerfile
-    container_name: graphql
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-    restart: unless-stopped
-    ports:
-      - "8443:8443"
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - 3000:3000
+  #   user: "104"
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  # graphql:
+  #   image: zenith110/portfolio-graphql
+  #   build:
+  #     context: ./backend
+  #     dockerfile: dev.dockerfile
+  #   container_name: graphql
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: "true"
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8443:8443"
     # env_file:
     #   - .env
-  emailcow:
-    image: mailcow/sogo
+  # emailcow:
+  #   image: mailcow/sogo
+  #   ports:
+  #     - "143:143"
+  #     - "993:993"
+  #     - "110:110"
+  #     - "995:995"
+  #     - "587:587"
+  #     - "465:465"
+  configure:
+    image: quay.io/gravitational/teleport:8
+    container_name: teleport-configure
+    entrypoint: /bin/sh
+    hostname: teleport.abrahannevarez.dev
+    command: -c "if [ ! -f /etc/teleport/teleport.yaml ]; then teleport configure > /etc/teleport/teleport.yaml; fi"
+    volumes:
+      - ./teleport-config:/etc/teleport
+
   teleport:
     image: quay.io/gravitational/teleport:8
     container_name: teleport
     entrypoint: /bin/sh
-    hostname: luna.teleport
-    command: -c "config"
+    hostname: teleport.abrahannevarez.dev
+    command: -c "sleep 1 && /bin/dumb-init teleport start -c /etc/teleport/teleport.yaml"
     ports:
       - "3023:3023"
       - "3024:3024"
       - "3025:3025"
-      - "443:443"
+      - "3080:3080"
     volumes:
-      - ./config:/etc/teleport
-      - ./data:/var/lib/teleport
-      - ./certs:/mnt/shared/certs
+      - ./teleport-config:/etc/teleport
+      - ./teleport-data:/var/lib/teleport
+    depends_on:
+      - configure

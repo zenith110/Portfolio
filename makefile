@@ -13,6 +13,9 @@ build: # Builds using all the dockerfiles and docker-compose provided
 clean: # Removes all orphans processes
 	@echo "Cleaning up processes for docker-compose"
 	@$(DEV_DOCKER_COMPOSE) down -v
+stop:
+	@echo "Putting down container now!"
+	@$(DEV_DOCKER_COMPOSE) down 
 detached: # Runs the containers in daemon mode
 	@echo "Running processes in detached mode!"
 	@$(DEV_DOCKER_COMPOSE) up -d --build
