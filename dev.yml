@@ -1,39 +1,41 @@
 version: "3"
 
 services:
-  # grafana:
-  #   image: grafana/grafana:latest
-  #   ports:
-  #     - 3000:3000
-  #   user: "104"
-  # mongo:
-  #   image: mongo
-  #   restart: always
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: root
-  #     MONGO_INITDB_ROOT_PASSWORD: example
-  # graphql:
-  #   image: zenith110/portfolio-graphql
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    user: "104"
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  # frontend:
+  #   image: zenith110/frontend
   #   build:
-  #     context: ./backend
+  #     context: ./frontend
   #     dockerfile: dev.dockerfile
-  #   container_name: graphql
+  #   container_name: frontend
   #   environment:
   #     CHOKIDAR_USEPOLLING: "true"
   #   restart: unless-stopped
   #   ports:
-  #     - "8443:8443"
-    # env_file:
-    #   - .env
-  # emailcow:
-  #   image: mailcow/sogo
-  #   ports:
-  #     - "143:143"
-  #     - "993:993"
-  #     - "110:110"
-  #     - "995:995"
-  #     - "587:587"
-  #     - "465:465"
+  #     - "5000:5000"
+  graphql:
+    image: zenith110/portfolio-graphql
+    build:
+      context: ./backend
+      dockerfile: dev.dockerfile
+    container_name: graphql
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    env_file:
+      - .env
   configure:
     image: quay.io/gravitational/teleport:8
     container_name: teleport-configure
