@@ -6,11 +6,11 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"github.com/zenith110/portfolio/graph/middleware/authenticator"
+	"github.com/zenith110/portfolio/graph/middleware"
 )
 
 // Handler for our callback.
-func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
+func Handler(auth *middleware.Auth.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		session := sessions.Default(ctx)
 		if ctx.Query("state") != session.Get("state") {

@@ -9,7 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/zenith110/portfilo/graph"
 	"github.com/zenith110/portfilo/graph/generated"
-	"github.com/zenith110/portfolio/graph/middleware/authenticator"
+	"github.com/zenith110/portfolio/graph/middleware"
 )
 
 const defaultPort = "8080"
@@ -19,7 +19,7 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
-	auth, err := authenticator.New()
+	auth, err := middleware.Auth.authenticator.New()
 	if err != nil {
 		log.Fatalf("Failed to initialize the authenticator: %v", err)
 	}

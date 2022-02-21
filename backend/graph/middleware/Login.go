@@ -7,11 +7,11 @@ import (
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
-	"github.com/zenith110/portfolio/graph/middleware/authenticator"
+	"github.com/zenith110/portfolio/graph/middleware/Auth"
 )
 
 // Handler for our login.
-func Handler(auth *authenticator.Authenticator) gin.HandlerFunc {
+func Handler(auth *middleware.Auth.Authenticator) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		state, err := generateRandomState()
 		if err != nil {
