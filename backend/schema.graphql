@@ -1,42 +1,42 @@
 schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 type Query {
-    article(name: String!): Article
-    articles: Articles
-    githubProjects: GithubProjects
+  article(name: String!): Article
+  articles: Articles
+  githubProjects: GithubProjects
 }
-type Mutation{
-    createArticle(input: NewArticle): Article!
-    login(input: LoginUser): AccessCode
+type Mutation {
+  createArticle(input: NewArticle): Article!
+  login(input: LoginUser): AccessCode
 }
-type AccessCode{
-    statusCode: ID!
-    allowedAccess: Boolean!
+type AccessCode {
+  statusCode: ID!
+  allowedAccess: Boolean!
 }
-type Image{
-    url: String!
+type Image {
+  url: String!
 }
 
-type Content{
-    images: [Image]!
-    content: String!
+type Content {
+  images: [Image]!
+  content: String!
 }
-input NewArticle{
-    name: String!
-    content: String!
+input NewArticle {
+  name: String!
+  content: String!
 }
-input LoginUser{
-    username: String!
-    password: String!
+input LoginUser {
+  username: String!
+  password: String!
 }
-type Author{
-    name: String!
-    profile: String!
-    picture: String!
+type Author {
+  name: String!
+  profile: String!
+  picture: String!
 }
-type Article{
+type Article {
   name: String!
   author: Author!
   contentData: [Content]!
@@ -44,23 +44,21 @@ type Article{
   url: String!
 }
 
-type Articles{
-    articles: [Article]!
-    total: Int!
+type Articles {
+  articles: [Article]!
+  total: Int!
 }
-type Tag{
-    language: String!
-    image: String!
+type Tag {
+  language: String!
 }
-type Project{
-    name: String!
-    tags: [Tag]!
-    link: String!
-    readme: String!
+type Project {
+  name: String!
+  link: String!
+  readme: String!
+  createdon: String!
+  languages: [Tag!]!
+  stars: Int!
 }
-type GithubProjects{
-    projects: [Project]!
+type GithubProjects {
+  projects: [Project]!
 }
-
-
-

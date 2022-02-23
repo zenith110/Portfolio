@@ -28,7 +28,7 @@ const ProjectContainer = ({ project }) => (
       </a>
     )}
 
-    {project.livePreview && (
+    {project.livePreview === 'nil' && (
       <a
         href={project.livePreview}
         aria-label='live preview'

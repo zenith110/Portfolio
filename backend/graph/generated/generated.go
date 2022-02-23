@@ -85,10 +85,12 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		Link   func(childComplexity int) int
-		Name   func(childComplexity int) int
-		Readme func(childComplexity int) int
-		Tags   func(childComplexity int) int
+		Createdon func(childComplexity int) int
+		Languages func(childComplexity int) int
+		Link      func(childComplexity int) int
+		Name      func(childComplexity int) int
+		Readme    func(childComplexity int) int
+		Stars     func(childComplexity int) int
 	}
 
 	Query struct {
@@ -98,7 +100,6 @@ type ComplexityRoot struct {
 	}
 
 	Tag struct {
-		Image    func(childComplexity int) int
 		Language func(childComplexity int) int
 	}
 }
@@ -264,6 +265,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(*model.LoginUser)), true
 
+	case "Project.createdon":
+		if e.complexity.Project.Createdon == nil {
+			break
+		}
+
+		return e.complexity.Project.Createdon(childComplexity), true
+
+	case "Project.languages":
+		if e.complexity.Project.Languages == nil {
+			break
+		}
+
+		return e.complexity.Project.Languages(childComplexity), true
+
 	case "Project.link":
 		if e.complexity.Project.Link == nil {
 			break
@@ -285,12 +300,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Readme(childComplexity), true
 
-	case "Project.tags":
-		if e.complexity.Project.Tags == nil {
+	case "Project.stars":
+		if e.complexity.Project.Stars == nil {
 			break
 		}
 
-		return e.complexity.Project.Tags(childComplexity), true
+		return e.complexity.Project.Stars(childComplexity), true
 
 	case "Query.article":
 		if e.complexity.Query.Article == nil {
@@ -317,13 +332,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GithubProjects(childComplexity), true
-
-	case "Tag.image":
-		if e.complexity.Tag.Image == nil {
-			break
-		}
-
-		return e.complexity.Tag.Image(childComplexity), true
 
 	case "Tag.language":
 		if e.complexity.Tag.Language == nil {
@@ -397,44 +405,44 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "schema.graphql", Input: `schema {
-    query: Query
-    mutation: Mutation
+  query: Query
+  mutation: Mutation
 }
 type Query {
-    article(name: String!): Article
-    articles: Articles
-    githubProjects: GithubProjects
+  article(name: String!): Article
+  articles: Articles
+  githubProjects: GithubProjects
 }
-type Mutation{
-    createArticle(input: NewArticle): Article!
-    login(input: LoginUser): AccessCode
+type Mutation {
+  createArticle(input: NewArticle): Article!
+  login(input: LoginUser): AccessCode
 }
-type AccessCode{
-    statusCode: ID!
-    allowedAccess: Boolean!
+type AccessCode {
+  statusCode: ID!
+  allowedAccess: Boolean!
 }
-type Image{
-    url: String!
+type Image {
+  url: String!
 }
 
-type Content{
-    images: [Image]!
-    content: String!
+type Content {
+  images: [Image]!
+  content: String!
 }
-input NewArticle{
-    name: String!
-    content: String!
+input NewArticle {
+  name: String!
+  content: String!
 }
-input LoginUser{
-    username: String!
-    password: String!
+input LoginUser {
+  username: String!
+  password: String!
 }
-type Author{
-    name: String!
-    profile: String!
-    picture: String!
+type Author {
+  name: String!
+  profile: String!
+  picture: String!
 }
-type Article{
+type Article {
   name: String!
   author: Author!
   contentData: [Content]!
@@ -442,26 +450,24 @@ type Article{
   url: String!
 }
 
-type Articles{
-    articles: [Article]!
-    total: Int!
+type Articles {
+  articles: [Article]!
+  total: Int!
 }
-type Tag{
-    language: String!
-    image: String!
+type Tag {
+  language: String!
 }
-type Project{
-    name: String!
-    tags: [Tag]!
-    link: String!
-    readme: String!
+type Project {
+  name: String!
+  link: String!
+  readme: String!
+  createdon: String!
+  languages: [Tag!]!
+  stars: Int!
 }
-type GithubProjects{
-    projects: [Project]!
+type GithubProjects {
+  projects: [Project]!
 }
-
-
-
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1244,41 +1250,6 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_tags(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Tags, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.Tag)
-	fc.Result = res
-	return ec.marshalNTag2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Project_link(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1347,6 +1318,111 @@ func (ec *executionContext) _Project_readme(ctx context.Context, field graphql.C
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_createdon(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Createdon, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_languages(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Languages, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]model.Tag)
+	fc.Result = res
+	return ec.marshalNTag2ᚕgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTagᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_stars(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Stars, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_article(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1542,41 +1618,6 @@ func (ec *executionContext) _Tag_language(ctx context.Context, field graphql.Col
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Language, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _Tag_image(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Tag",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Image, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3068,11 +3109,6 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "tags":
-			out.Values[i] = ec._Project_tags(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "link":
 			out.Values[i] = ec._Project_link(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -3080,6 +3116,21 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "readme":
 			out.Values[i] = ec._Project_readme(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdon":
+			out.Values[i] = ec._Project_createdon(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "languages":
+			out.Values[i] = ec._Project_languages(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "stars":
+			out.Values[i] = ec._Project_stars(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3170,11 +3221,6 @@ func (ec *executionContext) _Tag(ctx context.Context, sel ast.SelectionSet, obj 
 			out.Values[i] = graphql.MarshalString("Tag")
 		case "language":
 			out.Values[i] = ec._Tag_language(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "image":
-			out.Values[i] = ec._Tag_image(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3675,7 +3721,11 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNTag2ᚕᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+func (ec *executionContext) marshalNTag2githubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v model.Tag) graphql.Marshaler {
+	return ec._Tag(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTag2ᚕgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTagᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Tag) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -3699,7 +3749,7 @@ func (ec *executionContext) marshalNTag2ᚕᚖgithubᚗcomᚋzenith110ᚋportfil
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOTag2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx, sel, v[i])
+			ret[i] = ec.marshalNTag2githubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -3709,6 +3759,12 @@ func (ec *executionContext) marshalNTag2ᚕᚖgithubᚗcomᚋzenith110ᚋportfil
 
 	}
 	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
 
 	return ret
 }
@@ -4081,13 +4137,6 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
-}
-
-func (ec *executionContext) marshalOTag2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v *model.Tag) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Tag(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

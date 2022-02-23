@@ -8,6 +8,7 @@ const Footer = () => (
     >
       Created By Raj Shekhar
     </a>
+    <p>Modified by Abrahan Nevarez</p>
   </footer>
 )
 

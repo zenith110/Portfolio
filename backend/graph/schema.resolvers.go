@@ -26,11 +26,13 @@ func (r *queryResolver) Article(ctx context.Context, name string) (*model.Articl
 }
 
 func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
-	articles, err := routes.FetchArticles(databaseUri, dbName, dbCollection)
-	return articles, err
+	// articles, err := routes.FetchArticles(databaseUri, dbName, dbCollection)
+	// return articles, err
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjects, error) {
+	githubUser := os.Getenv("GITHUBUSER")
 	github, err := routes.FetchProjects(githubUser)
 	return github, err
 }
@@ -43,15 +45,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-var databaseUri = os.Getenv("DATABASEURI")
-var dbName = os.Getenv("DBNAME")
-var dbCollection = os.Getenv("DBCOLLECTION")
-var githubToken = os.Getenv("GITHUB")
-var githubUser = os.Getenv("GITHUBUSER")

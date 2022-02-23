@@ -4,7 +4,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - 3000:3000
+      - 4000:4000
     user: "104"
   mongo:
     image: mongo
@@ -12,19 +12,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-  # frontend:
-  #   image: zenith110/frontend
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: dev.dockerfile
-  #   container_name: frontend
-  #   environment:
-  #     CHOKIDAR_USEPOLLING: "true"
-  #   restart: unless-stopped
-  #   ports:
-  #     - "5000:5000"
   graphql:
-    image: zenith110/portfolio-graphql
     build:
       context: ./backend
       dockerfile: dev.dockerfile
@@ -33,9 +21,26 @@ services:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
     ports:
-      - "8443:8443"
+      - 8443:8443
     env_file:
       - .env
+  portfolio:
+    build:
+      context: ./frontend/frontpage
+      dockerfile: dev.dockerfile
+    container_name: portfolio
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - ./frontend/frontpage:/home/app/portfolio
+    env_file:
+      - .env
+    depends_on:
+      - graphql
   configure:
     image: quay.io/gravitational/teleport:8
     container_name: teleport-configure
