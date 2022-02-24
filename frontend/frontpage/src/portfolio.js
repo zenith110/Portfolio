@@ -14,6 +14,9 @@ async function grapqhlSender() {
           readme
           stars
           createdon
+          languages{
+            language
+          }
         }
       }
       }`,
@@ -28,6 +31,7 @@ async function grapqhlSender() {
       readme: projectInfo.readme,
       stars: projectInfo.stars,
       createdOn: projectInfo.createdOn,
+      stack: projectInfo.languages,
     })
   )
   return projectsData
@@ -44,7 +48,7 @@ const about = {
   name: 'Abrahan Nevarez',
   role: 'Fullstack Engineer',
   description:
-    'Adipisicing sit fugit ullam unde aliquid sequi Facilis soluta facilis perspiciatis corporis nulla aspernatur. Autem eligendi rerum delectus modi quisquam? Illo ut quasi nemo ipsa cumque perspiciatis! Maiores minima consectetur.',
+    'Hi there. I am currently a full stack engineer dabbling in various technologies. Currently I am learning the Grafana stack: Grafana, Loki, and Tempo. I am also learning Terraform to develop infrastructure. ',
   resume: 'https://example.com',
   social: {
     linkedin: 'https://www.linkedin.com/in/abrahan-nevarez/',

@@ -54,8 +54,16 @@ const Navbar = () => {
             </a>
           </li>
         ) : null}
+        <li className='nav__list-item'>
+          <a
+            href='https://admin.abrahannevarez.dev'
+            onClick={toggleNavList}
+            className='link link--nav'
+          >
+            Admin Panel
+          </a>
+        </li>
       </ul>
-
       <button
         type='button'
         onClick={toggleTheme}

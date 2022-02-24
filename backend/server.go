@@ -24,7 +24,7 @@ func main() {
 	}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://0.0.0.0:" + port, "http://localhost:3000"},
+		AllowedOrigins:   []string{"http://0.0.0.0:" + port, "http://localhost:3000", "http://localhost:8443"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)

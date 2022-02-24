@@ -56,6 +56,7 @@ type Project struct {
 	Createdon string `json:"createdon"`
 	Languages []Tag  `json:"languages"`
 	Stars     int    `json:"stars"`
+	Topics    []Tag  `json:"topics"`
 }
 
 type Tag struct {

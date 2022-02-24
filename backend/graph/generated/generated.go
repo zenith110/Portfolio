@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 		Name      func(childComplexity int) int
 		Readme    func(childComplexity int) int
 		Stars     func(childComplexity int) int
+		Topics    func(childComplexity int) int
 	}
 
 	Query struct {
@@ -307,6 +308,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Stars(childComplexity), true
 
+	case "Project.topics":
+		if e.complexity.Project.Topics == nil {
+			break
+		}
+
+		return e.complexity.Project.Topics(childComplexity), true
+
 	case "Query.article":
 		if e.complexity.Query.Article == nil {
 			break
@@ -464,6 +472,7 @@ type Project {
   createdon: String!
   languages: [Tag!]!
   stars: Int!
+  topics: [Tag!]!
 }
 type GithubProjects {
   projects: [Project]!
@@ -1423,6 +1432,41 @@ func (ec *executionContext) _Project_stars(ctx context.Context, field graphql.Co
 	res := resTmp.(int)
 	fc.Result = res
 	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_topics(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Topics, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]model.Tag)
+	fc.Result = res
+	return ec.marshalNTag2ᚕgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTagᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_article(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3131,6 +3175,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "stars":
 			out.Values[i] = ec._Project_stars(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "topics":
+			out.Values[i] = ec._Project_topics(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
