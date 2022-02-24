@@ -37,7 +37,6 @@ func ParseLanguages(languagesUrl string) ([]model.Tag){
 		tag.Language = regexData[stackData]
 		tags = append(tags, tag)
 	}
-	fmt.Print("Tags are: ", tags)
 	return tags
 }
 func StringConvert(text *string) (string){
@@ -77,7 +76,6 @@ func FetchProjects(githubUser string) (*model.GithubProjects, error) {
 				
 			})
 	}
-	fmt.Print("projects are: ", projects)
 	var gitProjects = model.GithubProjects{Projects: projects}
 	return &gitProjects, err
 }
