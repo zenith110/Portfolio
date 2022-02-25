@@ -2,7 +2,7 @@ import { header } from '../../portfolio'
 import Navbar from '../Navbar/Navbar'
 import './Header.css'
 
-const Header = () => {
+const Header = ({ projects, skills }) => {
   const { homepage, title } = header
 
   return (
@@ -16,7 +16,7 @@ const Header = () => {
           title
         )}
       </h3>
-      <Navbar />
+      <Navbar projects={projects} skills={skills} />
     </header>
   )
 }

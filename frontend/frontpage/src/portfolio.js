@@ -1,46 +1,7 @@
-const projectsData = []
-async function grapqhlSender() {
-  const grapqhlClient = await fetch(process.env.REACT_APP_GRAPHQL_URL, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      query: `{
-        githubProjects{
-        projects{
-          name
-          link
-          readme
-          stars
-          createdon
-          languages{
-            language
-          }
-        }
-      }
-      }`,
-    }),
-  })
-  const data = await grapqhlClient.json()
-  const dataInnards = data.data.githubProjects.projects
-  dataInnards.map((projectInfo) =>
-    projectsData.push({
-      name: projectInfo.name,
-      link: projectInfo.link,
-      readme: projectInfo.readme,
-      stars: projectInfo.stars,
-      createdOn: projectInfo.createdOn,
-      stack: projectInfo.languages,
-    })
-  )
-  return projectsData
-}
-const grapqhlData = grapqhlSender()
 const header = {
   // all the properties are optional - can be left empty or deleted
-  homepage: 'https://rajshekhar26.github.io/cleanfolio',
-  title: 'JS.',
+  homepage: 'https://abrahannevarez.dev',
+  title: 'Home',
 }
 
 const about = {
@@ -55,35 +16,6 @@ const about = {
     github: 'https://github.com/zenith110',
   },
 }
-
-// projects can be added an removed
-// if there are no projects, Projects section won't show up
-const projects = []
-grapqhlData.then((data) =>
-  data.map((projectInfo) =>
-    projects.push({
-      name: projectInfo.name,
-      description: projectInfo.readme,
-      sourceCode: projectInfo.link,
-      // stack: ['SASS', 'TypeScript', 'React'],
-      // sourceCode: 'https://github.com',
-      // livePreview: 'https://github.com',
-    })
-  )
-)
-
-// projects can be added an removed
-// if there are no projects, Projects section won't show up
-// grapqhlData.then((data) =>
-//   data.map((projectInfo) => {
-// name: projectInfo.name,
-// description:
-//   'Amet asperiores et impedit aliquam consectetur? Voluptates sed a nulla ipsa officia et esse aliquam',
-// stack: ['SASS', 'TypeScript', 'React'],
-// sourceCode: 'https://github.com',
-// livePreview: 'https://github.com',
-//   })
-// )
 
 const skills = [
   // skills can be added or removed
@@ -107,4 +39,4 @@ const contact = {
   email: 'contact@abrahannevarez.dev',
 }
 
-export { header, about, projects, skills, contact }
+export { header, about, contact }

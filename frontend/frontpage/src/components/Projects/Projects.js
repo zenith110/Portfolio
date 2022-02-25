@@ -1,11 +1,11 @@
 import uniqid from 'uniqid'
-import { projects } from '../../portfolio'
 import ProjectContainer from '../ProjectContainer/ProjectContainer'
+
 import './Projects.css'
 
-const Projects = () => {
-  console.log('length is: ', projects.length)
+const Projects = ({ projects }) => {
   if (projects.length <= 0) return null
+  console.log(projects[0].stack[0].language)
   return (
     <section id='projects' className='section projects'>
       <h2 className='section__title'>Projects</h2>
