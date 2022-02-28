@@ -17,23 +17,6 @@ const about = {
   },
 }
 
-const skills = [
-  // skills can be added or removed
-  // if there are no skills, Skills section won't show up
-  'HTML',
-  'CSS',
-  'JavaScript',
-  'TypeScript',
-  'React',
-  'Redux',
-  'SASS',
-  'Material UI',
-  'Git',
-  'CI/CD',
-  'Jest',
-  'Enzyme',
-]
-
 const contact = {
   // email is optional - if left empty Contact section won't show up
   email: 'contact@abrahannevarez.dev',

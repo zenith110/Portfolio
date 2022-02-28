@@ -85,13 +85,13 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		Createdon func(childComplexity int) int
-		Languages func(childComplexity int) int
-		Link      func(childComplexity int) int
-		Name      func(childComplexity int) int
-		Readme    func(childComplexity int) int
-		Stars     func(childComplexity int) int
-		Topics    func(childComplexity int) int
+		Createdon      func(childComplexity int) int
+		Deploymentlink func(childComplexity int) int
+		Description    func(childComplexity int) int
+		Githublink     func(childComplexity int) int
+		Languages      func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Topics         func(childComplexity int) int
 	}
 
 	Query struct {
@@ -273,6 +273,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Createdon(childComplexity), true
 
+	case "Project.deploymentlink":
+		if e.complexity.Project.Deploymentlink == nil {
+			break
+		}
+
+		return e.complexity.Project.Deploymentlink(childComplexity), true
+
+	case "Project.description":
+		if e.complexity.Project.Description == nil {
+			break
+		}
+
+		return e.complexity.Project.Description(childComplexity), true
+
+	case "Project.githublink":
+		if e.complexity.Project.Githublink == nil {
+			break
+		}
+
+		return e.complexity.Project.Githublink(childComplexity), true
+
 	case "Project.languages":
 		if e.complexity.Project.Languages == nil {
 			break
@@ -280,33 +301,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Languages(childComplexity), true
 
-	case "Project.link":
-		if e.complexity.Project.Link == nil {
-			break
-		}
-
-		return e.complexity.Project.Link(childComplexity), true
-
 	case "Project.name":
 		if e.complexity.Project.Name == nil {
 			break
 		}
 
 		return e.complexity.Project.Name(childComplexity), true
-
-	case "Project.readme":
-		if e.complexity.Project.Readme == nil {
-			break
-		}
-
-		return e.complexity.Project.Readme(childComplexity), true
-
-	case "Project.stars":
-		if e.complexity.Project.Stars == nil {
-			break
-		}
-
-		return e.complexity.Project.Stars(childComplexity), true
 
 	case "Project.topics":
 		if e.complexity.Project.Topics == nil {
@@ -465,14 +465,15 @@ type Articles {
 type Tag {
   language: String!
 }
+
 type Project {
   name: String!
-  link: String!
-  readme: String!
+  githublink: String!
+  description: String!
   createdon: String!
   languages: [Tag!]!
-  stars: Int!
-  topics: [Tag!]!
+  topics: [String!]!
+  deploymentlink: String!
 }
 type GithubProjects {
   projects: [Project]!
@@ -1259,7 +1260,7 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_link(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+func (ec *executionContext) _Project_githublink(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1277,7 +1278,7 @@ func (ec *executionContext) _Project_link(ctx context.Context, field graphql.Col
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Link, nil
+		return obj.Githublink, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1294,7 +1295,7 @@ func (ec *executionContext) _Project_link(ctx context.Context, field graphql.Col
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_readme(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+func (ec *executionContext) _Project_description(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1312,7 +1313,7 @@ func (ec *executionContext) _Project_readme(ctx context.Context, field graphql.C
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Readme, nil
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1399,41 +1400,6 @@ func (ec *executionContext) _Project_languages(ctx context.Context, field graphq
 	return ec.marshalNTag2ᚕgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTagᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Project_stars(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "Project",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Stars, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
 func (ec *executionContext) _Project_topics(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1464,9 +1430,44 @@ func (ec *executionContext) _Project_topics(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.Tag)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalNTag2ᚕgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTagᚄ(ctx, field.Selections, res)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_deploymentlink(ctx context.Context, field graphql.CollectedField, obj *model.Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deploymentlink, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_article(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3153,13 +3154,13 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "link":
-			out.Values[i] = ec._Project_link(ctx, field, obj)
+		case "githublink":
+			out.Values[i] = ec._Project_githublink(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "readme":
-			out.Values[i] = ec._Project_readme(ctx, field, obj)
+		case "description":
+			out.Values[i] = ec._Project_description(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3173,13 +3174,13 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "stars":
-			out.Values[i] = ec._Project_stars(ctx, field, obj)
+		case "topics":
+			out.Values[i] = ec._Project_topics(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "topics":
-			out.Values[i] = ec._Project_topics(ctx, field, obj)
+		case "deploymentlink":
+			out.Values[i] = ec._Project_deploymentlink(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3768,6 +3769,42 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNTag2githubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐTag(ctx context.Context, sel ast.SelectionSet, v model.Tag) graphql.Marshaler {

@@ -12,19 +12,19 @@ import './App.css'
 
 const App = () => {
   const [{ themeName }] = useContext(ThemeContext)
-  // const [projects, setProjects] = useState([])
   const query = gql`
     query getProjects {
       githubProjects {
         projects {
           name
-          link
-          readme
-          stars
+          githublink
+          description
           createdon
+          deploymentlink
           languages {
             language
           }
+          topics
         }
       }
     }
@@ -37,12 +37,15 @@ const App = () => {
   if (error) return <p>Error :(</p>
   const projects = []
   const skillsStorage = []
+  const topicsStorage = []
   data.githubProjects.projects.map((projectInfo) =>
     projects.push({
       name: projectInfo.name,
-      description: projectInfo.readme,
-      sourceCode: projectInfo.link,
+      description: projectInfo.description,
+      sourceCode: projectInfo.githublink,
       stack: projectInfo.languages,
+      topics: projectInfo.topics,
+      livePreview: projectInfo.deploymentlink,
     })
   )
   data.githubProjects.projects.map((projectInfo) =>
@@ -50,15 +53,37 @@ const App = () => {
       skillsStorage.push(skillsData.language)
     )
   )
-  const skills = [...new Set(skillsStorage)]
-  console.table(skills)
+  data.githubProjects.projects.map((projectInfo) =>
+    projectInfo.topics.map((topic) => topicsStorage.push(topic))
+  )
+
+  const badSkills = [
+    'Ruby',
+    'SCSS',
+    'VBScript',
+    'Shell',
+    'Batchfile',
+    'Assembly',
+    'Emacs',
+    'Lisp',
+    'Vim',
+    'script',
+    'PLSQL',
+    'C',
+  ]
+  const filteredSkills = skillsStorage.filter(
+    (skill) => !badSkills.includes(skill)
+  )
+  const skills = [...new Set(filteredSkills)]
+  const topics = [...new Set(topicsStorage)]
+  topics.push('all')
   return (
     <div id='top' className={`${themeName} app`}>
       <Header projects={projects} skills={skills} />
 
       <main>
         <About />
-        <Projects projects={projects} />
+        <Projects projects={projects} topics={topics} />
         <Skills skills={skills} />
         <Contact />
       </main>

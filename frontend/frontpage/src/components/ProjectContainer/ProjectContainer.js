@@ -17,6 +17,15 @@ const ProjectContainer = ({ project }) => (
         ))}
       </ul>
     )}
+    {project.topics && (
+      <ul className='project__stack'>
+        {project.topics.map((topic) => (
+          <li key={uniqid()} className='project__stack-item' value={topic}>
+            {topic}
+          </li>
+        ))}
+      </ul>
+    )}
 
     {project.sourceCode && (
       <a
@@ -28,7 +37,7 @@ const ProjectContainer = ({ project }) => (
       </a>
     )}
 
-    {project.livePreview === 'nil' && (
+    {project.livePreview !== '' && (
       <a
         href={project.livePreview}
         aria-label='live preview'

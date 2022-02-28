@@ -50,13 +50,13 @@ type NewArticle struct {
 }
 
 type Project struct {
-	Name      string `json:"name"`
-	Link      string `json:"link"`
-	Readme    string `json:"readme"`
-	Createdon string `json:"createdon"`
-	Languages []Tag  `json:"languages"`
-	Stars     int    `json:"stars"`
-	Topics    []Tag  `json:"topics"`
+	Name           string   `json:"name"`
+	Githublink     string   `json:"githublink"`
+	Description    string   `json:"description"`
+	Createdon      string   `json:"createdon"`
+	Languages      []Tag    `json:"languages"`
+	Topics         []string `json:"topics"`
+	Deploymentlink string   `json:"deploymentlink"`
 }
 
 type Tag struct {

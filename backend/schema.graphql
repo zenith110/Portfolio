@@ -51,14 +51,15 @@ type Articles {
 type Tag {
   language: String!
 }
+
 type Project {
   name: String!
-  link: String!
-  readme: String!
+  githublink: String!
+  description: String!
   createdon: String!
   languages: [Tag!]!
-  stars: Int!
-  topics: [Tag!]!
+  topics: [String!]!
+  deploymentlink: String!
 }
 type GithubProjects {
   projects: [Project]!
