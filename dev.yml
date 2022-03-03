@@ -20,6 +20,9 @@ services:
     environment:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
+    labels:
+      - "traefik.http.routers.home.rule=Host(`graphqlapi.localhost`)"
+      - "traefik.http.services.home.loadbalancer.server.port=8443"
     ports:
       - 8443:8443
     env_file:
@@ -41,6 +44,20 @@ services:
       - .env
     depends_on:
       - graphql
+    
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.6
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
   configure:
     image: quay.io/gravitational/teleport:8
     container_name: teleport-configure

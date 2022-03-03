@@ -10,7 +10,8 @@ const about = {
   role: 'Fullstack Engineer',
   description:
     'Hi there. I am currently a full stack engineer dabbling in various technologies. Currently I am learning the Grafana stack: Grafana, Loki, and Tempo. I am also learning Terraform to develop infrastructure. ',
-  resume: 'https://example.com',
+  resume:
+    'https://fetchitbucket.s3.us-east-2.amazonaws.com/Abrahan_Nevarez_Latest_Resume.pdf',
   social: {
     linkedin: 'https://www.linkedin.com/in/abrahan-nevarez/',
     github: 'https://github.com/zenith110',
