@@ -25,7 +25,7 @@ func main() {
 	}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{allowedOrigin},
+		AllowedOrigins:   []string{"https://abrahannevarez.dev/", "https://www.abrahannevarez.de/v", "https://graphql.abrahannevarez.dev/"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
