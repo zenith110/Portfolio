@@ -19,13 +19,13 @@ const defaultPort = "8080"
 
 func main() {
 	port := os.Getenv("GRAPHQLPORT")
-	allowedOrigins := os.Getenv("ALLOWED_ORIGIN")
+	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
 	if port == "" {
 		port = defaultPort
 	}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{allowedOrigins},
+		AllowedOrigins:   []string{allowedOrigin},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
@@ -34,7 +34,7 @@ func main() {
         Upgrader: websocket.Upgrader{
             CheckOrigin: func(r *http.Request) bool {
                 // Check against your desired domains here
-                 return r.Host == "http://localhost:3000"
+                 return r.Host == allowedOrigin
             },
             ReadBufferSize:  1024,
             WriteBufferSize: 1024,
