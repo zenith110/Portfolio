@@ -30,6 +30,9 @@ const App = () => {
     }
   `
   const { loading, error, data } = useQuery(query)
+  console.log('query is: ', query)
+  console.log('loading is: ', loading)
+  console.log('data is: ', data)
   console.log('error is: ', error)
   if (loading) {
     return <p>Loading Graphql data...</p>

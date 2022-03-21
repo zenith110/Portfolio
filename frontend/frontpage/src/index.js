@@ -6,11 +6,7 @@ import { ThemeProvider } from './contexts/theme'
 
 import './index.css'
 
-// const cache = new InMemoryCache()
-// await persistCache({
-//   cache,
-//   storage: new localStorageWrapper(window.localStorage),
-// })
+console.log(process.env.REACT_APP_GRAPHQL_URL)
 const client = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_URL,
   cache: new InMemoryCache(),
