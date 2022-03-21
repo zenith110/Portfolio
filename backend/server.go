@@ -19,12 +19,13 @@ const defaultPort = "8080"
 
 func main() {
 	port := os.Getenv("GRAPHQLPORT")
+	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
 	if port == "" {
 		port = defaultPort
 	}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://*"},
+		AllowedOrigins:   []string{allowedOrigins},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
