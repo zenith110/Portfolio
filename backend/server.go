@@ -19,13 +19,14 @@ const defaultPort = "8080"
 
 func main() {
 	port := os.Getenv("GRAPHQLPORT")
-	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
+	
 	if port == "" {
 		port = defaultPort
 	}
 	router := chi.NewRouter()
 	router.Use(cors.New(cors.Options{
 		AllowedOrigins:   []string{"https://abrahannevarez.dev/", "https://www.abrahannevarez.de/v", "https://graphql.abrahannevarez.dev/"},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
@@ -34,7 +35,7 @@ func main() {
         Upgrader: websocket.Upgrader{
             CheckOrigin: func(r *http.Request) bool {
                 // Check against your desired domains here
-                 return r.Host == allowedOrigin
+                 return r.Host == "https://abrahannevarez.dev/"
             },
             ReadBufferSize:  1024,
             WriteBufferSize: 1024,
