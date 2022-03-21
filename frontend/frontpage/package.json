@@ -2,7 +2,6 @@
   "name": "cleanfolio",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://rajshekhar26.github.io/cleanfolio",
   "dependencies": {
     "@apollo/client": "^3.5.9",
     "@material-ui/core": "^4.12.3",
