@@ -20,7 +20,6 @@ const defaultPort = "8080"
 func main() {
 	port := os.Getenv("GRAPHQLPORT")
 	domain := os.Getenv("DOMAIN")
-	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
 	if port == "" {
 		port = defaultPort
 	}
