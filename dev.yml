@@ -44,7 +44,23 @@ services:
       - .env
     depends_on:
       - graphql
-    
+  admin:
+    build:
+      context: ./frontend/admin-panel
+      dockerfile: dev.dockerfile
+    container_name: admin
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - ./frontend/admin-panel:/home/app/admin-tool
+    env_file:
+      - .env
+    depends_on:
+      - graphql
   reverse-proxy:
     # The official v2 Traefik docker image
     image: traefik:v2.6
