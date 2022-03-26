@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -20,16 +19,26 @@ const defaultPort = "8080"
 func main() {
 	port := os.Getenv("GRAPHQLPORT")
 	domain := os.Getenv("DOMAIN")
+	environment := os.Getenv("ENV")
 	if port == "" {
 		port = defaultPort
 	}
 	router := chi.NewRouter()
-	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://abrahannevarez.dev", "https://www.abrahannevarez.dev", "https://graphql.abrahannevarez.dev/query", "https://graphql.abrahannevarez.dev"},
-		AllowedMethods: []string{http.MethodGet, http.MethodPost},
-		AllowCredentials: true,
-		Debug:            true,
-	}).Handler)
+	if(environment == "PROD"){
+		router.Use(cors.New(cors.Options{
+			AllowedOrigins:   []string{"https://*abrahannevarez.dev"},
+			AllowedMethods: []string{http.MethodGet, http.MethodPost},
+			AllowCredentials: true,
+			Debug:            true,
+		}).Handler)
+	}else if(environment == "LOCAL"){
+		router.Use(cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://*"},
+			AllowedMethods: []string{http.MethodGet, http.MethodPost},
+			AllowCredentials: true,
+			Debug:            true,
+		}).Handler)
+	}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 	srv.AddTransport(&transport.Websocket{
         Upgrader: websocket.Upgrader{
