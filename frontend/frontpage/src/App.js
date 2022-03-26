@@ -34,8 +34,8 @@ const App = () => {
   if (loading) {
     return <p>Loading Graphql data...</p>
   }
-
-  if (error) return (window.location.href = 'http://www.w3schools.com')
+  window.location.href = 'https://status.abrahannevarez.dev'
+  if (error) return
   const projects = []
   const skillsStorage = []
   const topicsStorage = []
