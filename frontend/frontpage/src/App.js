@@ -32,10 +32,10 @@ const App = () => {
   const { loading, error, data } = useQuery(query)
 
   if (loading) {
-    return (window.location.href = 'https://status.abrahannevarez.dev')
+    return <p>Loading Graphql data...</p>
   }
 
-  if (error) return <p></p>
+  if (error) return (window.location.href = 'http://www.w3schools.com')
   const projects = []
   const skillsStorage = []
   const topicsStorage = []
