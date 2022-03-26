@@ -71,6 +71,9 @@ const App = () => {
     'script',
     'PLSQL',
     'C',
+    'Emacs Lisp',
+    'Vim script',
+    'Makefile',
   ]
   const filteredSkills = skillsStorage.filter(
     (skill) => !badSkills.includes(skill)
