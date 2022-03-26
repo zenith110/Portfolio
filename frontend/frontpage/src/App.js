@@ -34,8 +34,8 @@ const App = () => {
   if (loading) {
     return <p>Loading Graphql data...</p>
   }
-  window.location.href = 'https://status.abrahannevarez.dev'
-  if (error) return
+  // eslint-disable-next-line no-return-assign
+  if (error) return (window.location.href = 'https://status.abrahannevarez.dev')
   const projects = []
   const skillsStorage = []
   const topicsStorage = []
