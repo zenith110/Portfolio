@@ -13,8 +13,11 @@ import (
 	"github.com/zenith110/portfilo/graph/routes"
 )
 
-func (r *mutationResolver) CreateArticle(ctx context.Context, input *model.NewArticle) (*model.Article, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) CreateArticle(ctx context.Context, title *string, author *string, contentData *string, dateWritten *string, url *string) (*model.Article, error) {
+	var article model.Article
+	var err error
+	routes.CreateArticle(title, author, contentData, dateWritten, url)
+	return &article, err
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error) {
@@ -26,9 +29,8 @@ func (r *queryResolver) Article(ctx context.Context, name string) (*model.Articl
 }
 
 func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
-	// articles, err := routes.FetchArticles(databaseUri, dbName, dbCollection)
-	// return articles, err
-	panic(fmt.Errorf("not implemented"))
+	articles, err := routes.FetchArticles()
+	return articles, err
 }
 
 func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjects, error) {

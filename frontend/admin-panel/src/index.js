@@ -16,16 +16,23 @@ Coded by www.creative-tim.com
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import App from "App";
 
 // Material Dashboard 2 React Context Provider
 import { MaterialUIControllerProvider } from "context";
 
+const client = new ApolloClient({
+  uri: process.env.REACT_APP_GRAPHQL_URL,
+  cache: new InMemoryCache(),
+});
 ReactDOM.render(
-  <BrowserRouter>
-    <MaterialUIControllerProvider>
-      <App />
-    </MaterialUIControllerProvider>
-  </BrowserRouter>,
+  <ApolloProvider client={client}>
+    <BrowserRouter>
+      <MaterialUIControllerProvider>
+        <App />
+      </MaterialUIControllerProvider>
+    </BrowserRouter>
+  </ApolloProvider>,
   document.getElementById("root")
 );

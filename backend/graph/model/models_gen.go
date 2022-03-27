@@ -8,16 +8,24 @@ type AccessCode struct {
 }
 
 type Article struct {
-	Name        string     `json:"name"`
-	Author      *Author    `json:"author"`
-	ContentData []*Content `json:"contentData"`
-	DateWritten string     `json:"dateWritten"`
-	URL         string     `json:"url"`
+	Title       string  `json:"title"`
+	Author      *Author `json:"author"`
+	ContentData string  `json:"contentData"`
+	DateWritten string  `json:"dateWritten"`
+	URL         string  `json:"url"`
+}
+
+type ArticleTag struct {
+	Keyword string `json:"keyword"`
+}
+
+type ArticleTagInput struct {
+	Keyword string `json:"keyword"`
 }
 
 type Articles struct {
-	Articles []*Article `json:"articles"`
-	Total    int        `json:"total"`
+	Articles []Article `json:"articles"`
+	Total    int       `json:"total"`
 }
 
 type Author struct {
@@ -26,9 +34,10 @@ type Author struct {
 	Picture string `json:"picture"`
 }
 
-type Content struct {
-	Images  []*Image `json:"images"`
-	Content string   `json:"content"`
+type AuthorInput struct {
+	Name    string `json:"name"`
+	Profile string `json:"profile"`
+	Picture string `json:"picture"`
 }
 
 type GithubProjects struct {
@@ -42,11 +51,6 @@ type Image struct {
 type LoginUser struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-}
-
-type NewArticle struct {
-	Name    string `json:"name"`
-	Content string `json:"content"`
 }
 
 type Project struct {

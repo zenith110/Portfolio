@@ -72,6 +72,15 @@ const Navbar = ({ projects, skills }) => {
             Status Page
           </a>
         </li>
+        <li className='nav__list-item'>
+          <a
+            href='https://abrahannevarez.dev/blog'
+            onClick={toggleNavList}
+            className='link link--nav'
+          >
+            Blog
+          </a>
+        </li>
       </ul>
       <button
         type='button'

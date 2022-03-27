@@ -8,9 +8,7 @@ services:
   mongo:
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+    container_name: mongodb
   graphql:
     build:
       context: ./backend
@@ -32,7 +30,7 @@ services:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "80:3000"
     volumes:
       - /app/node_modules
       - ./frontend/frontpage:/home/app/portfolio
@@ -49,7 +47,7 @@ services:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
     ports:
-      - "5000:3000"
+      - "3000:3000"
     volumes:
       - /app/node_modules
       - ./frontend/admin-panel:/home/app/admin-tool

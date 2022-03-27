@@ -91,7 +91,6 @@ func FetchProjects(githubUser string) (*model.GithubProjects, error) {
 	repos := query.RepositoryOwner.Repositories.Nodes
 	var projects []*model.Project
 	for repo := 0; repo < len(repos); repo++ {
-				fmt.Printf("Topiocs are ", )
 				projects = append(projects, &model.Project{
 				Name:   repos[repo].Name,
 				Githublink:   repos[repo].Url,
@@ -102,7 +101,7 @@ func FetchProjects(githubUser string) (*model.GithubProjects, error) {
 			})
 	}
 	
-	// var gitProjects = model.GithubProjects{Projects: projects}
+	
 	var gitProjects = model.GithubProjects{Projects: projects}
 	return &gitProjects, queryErr
 }

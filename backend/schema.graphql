@@ -8,7 +8,13 @@ type Query {
   githubProjects: GithubProjects
 }
 type Mutation {
-  createArticle(input: NewArticle): Article!
+  createArticle(
+    title: String
+    author: String
+    contentData: String
+    dateWritten: String
+    url: String
+  ): Article!
   login(input: LoginUser): AccessCode
 }
 type AccessCode {
@@ -19,17 +25,21 @@ type Image {
   url: String!
 }
 
-type Content {
-  images: [Image]!
-  content: String!
-}
-input NewArticle {
-  name: String!
-  content: String!
-}
+# input NewArticle {
+#   name: String
+#   author: AuthorInput
+#   contentData: String
+#   dateWritten: String
+#   url: String
+# }
 input LoginUser {
   username: String!
   password: String!
+}
+input AuthorInput {
+  name: String!
+  profile: String!
+  picture: String!
 }
 type Author {
   name: String!
@@ -37,15 +47,20 @@ type Author {
   picture: String!
 }
 type Article {
-  name: String!
+  title: String!
   author: Author!
-  contentData: [Content]!
+  contentData: String!
   dateWritten: String!
   url: String!
 }
-
+type ArticleTag {
+  keyword: String!
+}
+input ArticleTagInput {
+  keyword: String!
+}
 type Articles {
-  articles: [Article]!
+  articles: [Article!]!
   total: Int!
 }
 type Tag {
