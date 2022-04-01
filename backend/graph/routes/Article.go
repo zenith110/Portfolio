@@ -4,39 +4,31 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/zenith110/portfilo/graph/model"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/bson"
 )
-func CreateArticle(title *string, author *string, contentData *string, dateWritten *string, url *string) (*model.Article, error){
-	mongoURI := os.Getenv("MONGOURI")
-	// Set client options
-	clientOptions := options.Client().ApplyURI(mongoURI)
 
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+func CreateArticle(input *model.CreateArticleInfo) (*model.Article, error) {
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")
+	client := ConnectToMongo()
 	collection := client.Database("blog").Collection("articles")
-	article := model.Article{Title: *title, Author: &model.Author{Name: *author, Profile: "", Picture: ""}, ContentData: *contentData, DateWritten: *dateWritten, URL: *url}
+	article := model.Article{Title: *input.Title, Author: &model.Author{Name: *input.Author, Profile: "", Picture: ""}, ContentData: *input.ContentData, DateWritten: *input.DateWritten, URL: *input.URL, Description: *input.Description, UUID: *input.UUID}
 	res, err := collection.InsertOne(context.TODO(), article)
 	if err != nil {
-    log.Fatal(err)
+		log.Fatal(err)
 	}
 
 	fmt.Println("Inserted a single document: ", res.InsertedID)
 	return &article, err
+}
+func DeleteArticle(uuid *string) (*model.Article, error) {
+	client := ConnectToMongo()
+	collection := client.Database("blog").Collection("articles")
+	article := model.Article{UUID: *uuid}
+	deleteResult, deleteError := collection.DeleteOne(context.TODO(), bson.M{"uuid": *uuid})
+	if deleteResult.DeletedCount == 0 {
+		log.Fatal("Error on deleting data", deleteError)
+	}
+	return &article, deleteError
 }

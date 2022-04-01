@@ -13,6 +13,8 @@ type Article struct {
 	ContentData string  `json:"contentData"`
 	DateWritten string  `json:"dateWritten"`
 	URL         string  `json:"url"`
+	Description string  `json:"description"`
+	UUID        string  `json:"uuid"`
 }
 
 type ArticleTag struct {
@@ -24,8 +26,8 @@ type ArticleTagInput struct {
 }
 
 type Articles struct {
-	Articles []Article `json:"articles"`
-	Total    int       `json:"total"`
+	Article []Article `json:"article"`
+	Total   int       `json:"total"`
 }
 
 type Author struct {
@@ -38,6 +40,16 @@ type AuthorInput struct {
 	Name    string `json:"name"`
 	Profile string `json:"profile"`
 	Picture string `json:"picture"`
+}
+
+type CreateArticleInfo struct {
+	Title       *string `json:"title"`
+	Author      *string `json:"author"`
+	ContentData *string `json:"contentData"`
+	DateWritten *string `json:"dateWritten"`
+	URL         *string `json:"url"`
+	Description *string `json:"description"`
+	UUID        *string `json:"uuid"`
 }
 
 type GithubProjects struct {
@@ -65,4 +77,11 @@ type Project struct {
 
 type Tag struct {
 	Language string `json:"language"`
+}
+
+type UpdatedArticleInfo struct {
+	Title       *string `json:"title"`
+	ContentData *string `json:"contentData"`
+	URL         *string `json:"url"`
+	Description *string `json:"description"`
 }

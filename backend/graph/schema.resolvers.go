@@ -13,18 +13,31 @@ import (
 	"github.com/zenith110/portfilo/graph/routes"
 )
 
-func (r *mutationResolver) CreateArticle(ctx context.Context, title *string, author *string, contentData *string, dateWritten *string, url *string) (*model.Article, error) {
-	var article model.Article
+func (r *mutationResolver) CreateArticle(ctx context.Context, input *model.CreateArticleInfo) (*model.Article, error) {
 	var err error
-	routes.CreateArticle(title, author, contentData, dateWritten, url)
-	return &article, err
+	article, err := routes.CreateArticle(input)
+	return article, err
+}
+
+func (r *mutationResolver) UpdateArticle(ctx context.Context, uuid *string, input *model.UpdatedArticleInfo) (*model.Article, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *mutationResolver) DeleteArticle(ctx context.Context, uuid *string) (*model.Article, error) {
+	article, err := routes.DeleteArticle(uuid)
+	return article, err
+}
+
+func (r *mutationResolver) DeleteAllArticles(ctx context.Context) (*model.Article, error) {
+	article, err := routes.DeleteArticles()
+	return article, err
 }
 
 func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Article(ctx context.Context, name string) (*model.Article, error) {
+func (r *queryResolver) Article(ctx context.Context, uuid string) (*model.Article, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 

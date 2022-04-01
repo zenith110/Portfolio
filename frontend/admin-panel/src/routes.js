@@ -45,6 +45,7 @@ import Billing from "layouts/billing";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import CreateArticle from "layouts/article-creation";
+import ArticleView from "layouts/article-view";
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -117,6 +118,14 @@ const routes = [
     icon: <Icon fontSize="small">text-snippet</Icon>,
     route: "/article/create/",
     component: <CreateArticle />,
+  },
+  {
+    type: "collapse",
+    name: "Article View",
+    key: "article-view",
+    icon: <Icon fontSize="small">text-snippet</Icon>,
+    route: "view/article",
+    component: <ArticleView />,
   },
 ];
 

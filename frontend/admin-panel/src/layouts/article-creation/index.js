@@ -18,9 +18,11 @@ import MDBox from "components/MDBox";
 import { gql, useMutation } from "@apollo/client";
 import SlateEditor from "./components/slate-editor";
 import HTMLSerializer from "./components/html-serializer";
+import { v4 as uuidv4 } from 'uuid';
 
 function CreateArticle() {
   const [title, setTitleName] = useState("");
+  const [description, setDescription] = useState("");
   const [value, setValue] = useState([
     {
       type: "paragraph",
@@ -28,17 +30,16 @@ function CreateArticle() {
     },
   ]);
   const createArticleClient = gql`
-    mutation($title: String!, $author: String!, $contentData: String!, $dateWritten: String!, $url: String!){
-    createArticle(title: $title, author: $author, contentData: $contentData, dateWritten: $dateWritten, url: $url){
-      title
+    mutation($newArticle: CreateArticleInfo){
+    createArticle(input: $newArticle){
+      uuid
+     }
     }
-}
   `;
   
   const [createArticle, { data, loading, error }] = useMutation(createArticleClient);
   if (loading) return "Submitting...";
   if (error) return `Submission error! ${error.message}`;
-  //   if (error) return (window.location.href = "https://status.abrahannevarez.dev");
   const currentDate = new Date();
   let date = currentDate.toISOString()
   return (
@@ -50,34 +51,52 @@ function CreateArticle() {
             <Grid item xs={12} lg={8}>
               <Grid container spacing={3}>
                 <Grid item xs={12} xl={6}>
-                  <label>
-                    <input
-                      style={{ textAlign: "" }}
-                      type="text"
-                      id="title"
-                      name="title"
-                      placeholder="title"
-                      onChange={(event) => setTitleName(event.target.value)}
-                    />
-                  </label>
-                  <SlateEditor value={value} setValue={setValue} />
-                  <button
-                    style={{ textAlign: "center" }}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      createArticle({
-                        variables: {
-                          title: title,
-                          author: "Abrahan",
-                          contentData: HTMLSerializer(value[0]),
-                          dateWritten: date,
-                          url: process.env.REACT_APP_DOMAIN + title.toLowerCase().replace(" ", "-"),
-                        },
-                      });
-                    }}
-                  >
-                    Submit Data
-                  </button>
+                  <div className="text-data">
+                    <label>
+                      <input
+                        style={{ textAlign: "" }}
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="title"
+                        onChange={(event) => setTitleName(event.target.value)}
+                      />
+                    </label>
+                    <label>
+                      <input
+                        style={{ textAlign: "" }}
+                        type="text"
+                        id="description"
+                        name="description"
+                        placeholder="description"
+                        onChange={(event) => setDescription(event.target.value)}
+                      />
+                    </label>
+                    <SlateEditor value={value} setValue={setValue} />
+                    <button
+                      style={{ textAlign: "center" }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        /*TODO: Modify author to include authed author*/
+                        let newArticleData = {  
+                              title: title,
+                              author: "Abrahan",
+                              contentData: HTMLSerializer(value[0]),
+                              dateWritten: date,
+                              url: process.env.REACT_APP_DOMAIN + title.toLowerCase().replace(" ", "-"),
+                              description: description,
+                              uuid: uuidv4()
+                            }
+                        createArticle({
+                          variables: {
+                            newArticle: newArticleData
+                          },
+                        });
+                      }}
+                    >
+                      Submit Data
+                    </button>
+                  </div>
                 </Grid>
               </Grid>
             </Grid>

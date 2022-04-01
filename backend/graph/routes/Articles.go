@@ -3,32 +3,18 @@ package routes
 import (
 	"context"
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/zenith110/portfilo/graph/model"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func FetchArticles() (*model.Articles, error) {
 	var err error
-	mongoURI := os.Getenv("MONGOURI")
 	// Create a temporary array of pointers for Article
 	var articlesStorage []model.Article
-	clientOptions := options.Client().ApplyURI(mongoURI)
-	// Create a new client and connect to the server
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-	if err != nil {
-		fmt.Print("Could not connect to database!")
-		panic(err)
-	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-			fmt.Print("Client has been disconnected!")
-			panic(err)
-		}
-	}()
+	client := ConnectToMongo()
 	db := client.Database("blog").Collection("articles")
 	findOptions := options.Find()
 	//Passing the bson.D{{}} as the filter matches documents in the collection
@@ -49,7 +35,7 @@ func FetchArticles() (*model.Articles, error) {
 		articlesStorage = append(articlesStorage, article)
 		totalArticles += 1
 	}
-	var articles = model.Articles{Articles: articlesStorage, Total: totalArticles}
+	var articles = model.Articles{Article: articlesStorage, Total: totalArticles}
 	if err := cur.Err(); err != nil {
 		fmt.Printf("An error has occured, could not parse cursor data! \nFull error %s", err.Error())
 	}
@@ -57,6 +43,17 @@ func FetchArticles() (*model.Articles, error) {
 	// Close the cursor once finished
 	cur.Close(context.TODO())
 
-	fmt.Printf("Found multiple documents: %+v\n", articlesStorage)
+	
 	return &articles, err
+}
+
+func DeleteArticles() (*model.Article, error) {
+	client := ConnectToMongo()
+	fmt.Print("Connected to mongodb!")
+	if err := client.Database("blog").Collection("articles").Drop(context.TODO()); err != nil {
+    	log.Fatal(err)
+	}
+	var article model.Article
+	var err error
+	return &article, err
 }

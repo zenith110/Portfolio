@@ -51,8 +51,10 @@ type ComplexityRoot struct {
 		Author      func(childComplexity int) int
 		ContentData func(childComplexity int) int
 		DateWritten func(childComplexity int) int
+		Description func(childComplexity int) int
 		Title       func(childComplexity int) int
 		URL         func(childComplexity int) int
+		UUID        func(childComplexity int) int
 	}
 
 	ArticleTag struct {
@@ -60,8 +62,8 @@ type ComplexityRoot struct {
 	}
 
 	Articles struct {
-		Articles func(childComplexity int) int
-		Total    func(childComplexity int) int
+		Article func(childComplexity int) int
+		Total   func(childComplexity int) int
 	}
 
 	Author struct {
@@ -79,8 +81,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateArticle func(childComplexity int, title *string, author *string, contentData *string, dateWritten *string, url *string) int
-		Login         func(childComplexity int, input *model.LoginUser) int
+		CreateArticle     func(childComplexity int, input *model.CreateArticleInfo) int
+		DeleteAllArticles func(childComplexity int) int
+		DeleteArticle     func(childComplexity int, uuid *string) int
+		Login             func(childComplexity int, input *model.LoginUser) int
+		UpdateArticle     func(childComplexity int, uuid *string, input *model.UpdatedArticleInfo) int
 	}
 
 	Project struct {
@@ -94,7 +99,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Article        func(childComplexity int, name string) int
+		Article        func(childComplexity int, uuid string) int
 		Articles       func(childComplexity int) int
 		GithubProjects func(childComplexity int) int
 	}
@@ -105,11 +110,14 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateArticle(ctx context.Context, title *string, author *string, contentData *string, dateWritten *string, url *string) (*model.Article, error)
+	CreateArticle(ctx context.Context, input *model.CreateArticleInfo) (*model.Article, error)
+	UpdateArticle(ctx context.Context, uuid *string, input *model.UpdatedArticleInfo) (*model.Article, error)
+	DeleteArticle(ctx context.Context, uuid *string) (*model.Article, error)
+	DeleteAllArticles(ctx context.Context) (*model.Article, error)
 	Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error)
 }
 type QueryResolver interface {
-	Article(ctx context.Context, name string) (*model.Article, error)
+	Article(ctx context.Context, uuid string) (*model.Article, error)
 	Articles(ctx context.Context) (*model.Articles, error)
 	GithubProjects(ctx context.Context) (*model.GithubProjects, error)
 }
@@ -164,6 +172,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Article.DateWritten(childComplexity), true
 
+	case "Article.description":
+		if e.complexity.Article.Description == nil {
+			break
+		}
+
+		return e.complexity.Article.Description(childComplexity), true
+
 	case "Article.title":
 		if e.complexity.Article.Title == nil {
 			break
@@ -178,6 +193,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Article.URL(childComplexity), true
 
+	case "Article.uuid":
+		if e.complexity.Article.UUID == nil {
+			break
+		}
+
+		return e.complexity.Article.UUID(childComplexity), true
+
 	case "ArticleTag.keyword":
 		if e.complexity.ArticleTag.Keyword == nil {
 			break
@@ -185,12 +207,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ArticleTag.Keyword(childComplexity), true
 
-	case "Articles.articles":
-		if e.complexity.Articles.Articles == nil {
+	case "Articles.article":
+		if e.complexity.Articles.Article == nil {
 			break
 		}
 
-		return e.complexity.Articles.Articles(childComplexity), true
+		return e.complexity.Articles.Article(childComplexity), true
 
 	case "Articles.total":
 		if e.complexity.Articles.Total == nil {
@@ -244,7 +266,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateArticle(childComplexity, args["title"].(*string), args["author"].(*string), args["contentData"].(*string), args["dateWritten"].(*string), args["url"].(*string)), true
+		return e.complexity.Mutation.CreateArticle(childComplexity, args["input"].(*model.CreateArticleInfo)), true
+
+	case "Mutation.deleteAllArticles":
+		if e.complexity.Mutation.DeleteAllArticles == nil {
+			break
+		}
+
+		return e.complexity.Mutation.DeleteAllArticles(childComplexity), true
+
+	case "Mutation.deleteArticle":
+		if e.complexity.Mutation.DeleteArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteArticle(childComplexity, args["uuid"].(*string)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -257,6 +298,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.Login(childComplexity, args["input"].(*model.LoginUser)), true
+
+	case "Mutation.updateArticle":
+		if e.complexity.Mutation.UpdateArticle == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateArticle_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateArticle(childComplexity, args["uuid"].(*string), args["input"].(*model.UpdatedArticleInfo)), true
 
 	case "Project.createdon":
 		if e.complexity.Project.Createdon == nil {
@@ -317,7 +370,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Article(childComplexity, args["name"].(string)), true
+		return e.complexity.Query.Article(childComplexity, args["uuid"].(string)), true
 
 	case "Query.articles":
 		if e.complexity.Query.Articles == nil {
@@ -409,19 +462,33 @@ var sources = []*ast.Source{
   mutation: Mutation
 }
 type Query {
-  article(name: String!): Article
+  article(uuid: String!): Article
   articles: Articles
   githubProjects: GithubProjects
 }
 type Mutation {
   createArticle(
+    input: CreateArticleInfo
+  ): Article!
+  updateArticle(uuid: String, input: UpdatedArticleInfo): Article!
+  deleteArticle(uuid: String): Article!
+  deleteAllArticles: Article!
+  login(input: LoginUser): AccessCode
+}
+input CreateArticleInfo{
     title: String
     author: String
     contentData: String
     dateWritten: String
     url: String
-  ): Article!
-  login(input: LoginUser): AccessCode
+    description: String
+    uuid: String
+}
+input UpdatedArticleInfo{
+    title: String
+    contentData: String
+    url: String
+    description: String
 }
 type AccessCode {
   statusCode: ID!
@@ -431,13 +498,6 @@ type Image {
   url: String!
 }
 
-# input NewArticle {
-#   name: String
-#   author: AuthorInput
-#   contentData: String
-#   dateWritten: String
-#   url: String
-# }
 input LoginUser {
   username: String!
   password: String!
@@ -458,6 +518,8 @@ type Article {
   contentData: String!
   dateWritten: String!
   url: String!
+  description: String!
+  uuid: String!
 }
 type ArticleTag {
   keyword: String!
@@ -466,7 +528,7 @@ input ArticleTagInput {
   keyword: String!
 }
 type Articles {
-  articles: [Article!]!
+  article: [Article!]!
   total: Int!
 }
 type Tag {
@@ -496,51 +558,30 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
+	var arg0 *model.CreateArticleInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOCreateArticleInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐCreateArticleInfo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
 	var arg0 *string
-	if tmp, ok := rawArgs["title"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+	if tmp, ok := rawArgs["uuid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
 		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["title"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["author"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["author"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["contentData"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentData"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["contentData"] = arg2
-	var arg3 *string
-	if tmp, ok := rawArgs["dateWritten"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateWritten"))
-		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["dateWritten"] = arg3
-	var arg4 *string
-	if tmp, ok := rawArgs["url"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-		arg4, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["url"] = arg4
+	args["uuid"] = arg0
 	return args, nil
 }
 
@@ -556,6 +597,30 @@ func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawAr
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["uuid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["uuid"] = arg0
+	var arg1 *model.UpdatedArticleInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalOUpdatedArticleInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐUpdatedArticleInfo(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
 	return args, nil
 }
 
@@ -578,14 +643,14 @@ func (ec *executionContext) field_Query_article_args(ctx context.Context, rawArg
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["uuid"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["name"] = arg0
+	args["uuid"] = arg0
 	return args, nil
 }
 
@@ -872,6 +937,76 @@ func (ec *executionContext) _Article_url(ctx context.Context, field graphql.Coll
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Article_description(ctx context.Context, field graphql.CollectedField, obj *model.Article) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Article",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Article_uuid(ctx context.Context, field graphql.CollectedField, obj *model.Article) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Article",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UUID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ArticleTag_keyword(ctx context.Context, field graphql.CollectedField, obj *model.ArticleTag) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -907,7 +1042,7 @@ func (ec *executionContext) _ArticleTag_keyword(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Articles_articles(ctx context.Context, field graphql.CollectedField, obj *model.Articles) (ret graphql.Marshaler) {
+func (ec *executionContext) _Articles_article(ctx context.Context, field graphql.CollectedField, obj *model.Articles) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -925,7 +1060,7 @@ func (ec *executionContext) _Articles_articles(ctx context.Context, field graphq
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Articles, nil
+		return obj.Article, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1177,7 +1312,126 @@ func (ec *executionContext) _Mutation_createArticle(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateArticle(rctx, args["title"].(*string), args["author"].(*string), args["contentData"].(*string), args["dateWritten"].(*string), args["url"].(*string))
+		return ec.resolvers.Mutation().CreateArticle(rctx, args["input"].(*model.CreateArticleInfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Article)
+	fc.Result = res
+	return ec.marshalNArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_updateArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_updateArticle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateArticle(rctx, args["uuid"].(*string), args["input"].(*model.UpdatedArticleInfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Article)
+	fc.Result = res
+	return ec.marshalNArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteArticle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteArticle_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteArticle(rctx, args["uuid"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Article)
+	fc.Result = res
+	return ec.marshalNArticle2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticle(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteAllArticles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAllArticles(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1503,7 +1757,7 @@ func (ec *executionContext) _Query_article(ctx context.Context, field graphql.Co
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Article(rctx, args["name"].(string))
+		return ec.resolvers.Query().Article(rctx, args["uuid"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2871,6 +3125,77 @@ func (ec *executionContext) unmarshalInputAuthorInput(ctx context.Context, obj i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateArticleInfo(ctx context.Context, obj interface{}) (model.CreateArticleInfo, error) {
+	var it model.CreateArticleInfo
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "author":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("author"))
+			it.Author, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contentData":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentData"))
+			it.ContentData, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "dateWritten":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dateWritten"))
+			it.DateWritten, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "uuid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
+			it.UUID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLoginUser(ctx context.Context, obj interface{}) (model.LoginUser, error) {
 	var it model.LoginUser
 	asMap := map[string]interface{}{}
@@ -2893,6 +3218,53 @@ func (ec *executionContext) unmarshalInputLoginUser(ctx context.Context, obj int
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
 			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdatedArticleInfo(ctx context.Context, obj interface{}) (model.UpdatedArticleInfo, error) {
+	var it model.UpdatedArticleInfo
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "contentData":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentData"))
+			it.ContentData, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "url":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
+			it.URL, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			it.Description, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2978,6 +3350,16 @@ func (ec *executionContext) _Article(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "description":
+			out.Values[i] = ec._Article_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "uuid":
+			out.Values[i] = ec._Article_uuid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3027,8 +3409,8 @@ func (ec *executionContext) _Articles(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Articles")
-		case "articles":
-			out.Values[i] = ec._Articles_articles(ctx, field, obj)
+		case "article":
+			out.Values[i] = ec._Articles_article(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3156,6 +3538,21 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createArticle":
 			out.Values[i] = ec._Mutation_createArticle(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateArticle":
+			out.Values[i] = ec._Mutation_updateArticle(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteArticle":
+			out.Values[i] = ec._Mutation_deleteArticle(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "deleteAllArticles":
+			out.Values[i] = ec._Mutation_deleteAllArticles(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -4121,6 +4518,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
+func (ec *executionContext) unmarshalOCreateArticleInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐCreateArticleInfo(ctx context.Context, v interface{}) (*model.CreateArticleInfo, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateArticleInfo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalOGithubProjects2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGithubProjects(ctx context.Context, sel ast.SelectionSet, v *model.GithubProjects) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -4165,6 +4570,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOUpdatedArticleInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐUpdatedArticleInfo(ctx context.Context, v interface{}) (*model.UpdatedArticleInfo, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdatedArticleInfo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
