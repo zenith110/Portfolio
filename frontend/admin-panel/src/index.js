@@ -17,6 +17,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import { createUploadLink } from "apollo-upload-client";
 import App from "App";
 
 // Material Dashboard 2 React Context Provider
@@ -25,6 +26,7 @@ import { MaterialUIControllerProvider } from "context";
 const client = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_URL,
   cache: new InMemoryCache(),
+  link: createUploadLink({ uri: process.env.REACT_APP_GRAPHQL_URL })
 });
 ReactDOM.render(
   <ApolloProvider client={client}>

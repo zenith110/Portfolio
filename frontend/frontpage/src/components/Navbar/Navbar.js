@@ -12,7 +12,6 @@ const Navbar = ({ projects, skills }) => {
   const [showNavList, setShowNavList] = useState(false)
 
   const toggleNavList = () => setShowNavList(!showNavList)
-
   return (
     <nav className='center nav'>
       <ul
@@ -56,7 +55,7 @@ const Navbar = ({ projects, skills }) => {
         ) : null}
         <li className='nav__list-item'>
           <a
-            href='https://admin.abrahannevarez.dev'
+            href={process.env.REACT_APP_ADMIN_PANEL}
             onClick={toggleNavList}
             className='link link--nav'
           >
@@ -74,7 +73,7 @@ const Navbar = ({ projects, skills }) => {
         </li>
         <li className='nav__list-item'>
           <a
-            href='https://abrahannevarez.dev/blog'
+            href={process.env.REACT_APP_BLOG}
             onClick={toggleNavList}
             className='link link--nav'
           >

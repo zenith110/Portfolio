@@ -5,12 +5,15 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import { gql, useQuery, useMutation} from "@apollo/client";
+import { gql, useQuery, useMutation, NetworkStatus} from "@apollo/client";
 import Grid from "@mui/material/Grid";
 import Article from "./components/article";
+import "./article-view.css"
 // Material Dashboard 2 React components
-import MDBox from "components/MDBox";
+import { useNavigate } from "react-router-dom"
+
 function ArticleView(){
+    const navigate = useNavigate()
     const articleViewQuery = gql`
     query{
     articles{
@@ -28,7 +31,7 @@ function ArticleView(){
     }
     }`;
   
-  const { data, loading, error } = useQuery(articleViewQuery);
+  const { data, loading, error } = useQuery(articleViewQuery, {notifyOnNetworkStatusChange: true});
   const deleteArticlesClient = gql`
             mutation{
             deleteAllArticles{
@@ -36,31 +39,41 @@ function ArticleView(){
                 }
             }
         `;
-  const [deleteAllArticles, { deleteData, deleteLoading, deleteError }] = useMutation(deleteArticlesClient);
+  const [deleteAllArticles, { deleteData, deleteLoading, deleteError }] = useMutation(deleteArticlesClient, {
+    refetchQueries: [
+      articleViewQuery
+    ]
+  });
   if (loading || deleteLoading) {
     return <p>Loading Graphql data...</p>
   }
   // eslint-disable-next-line no-return-assign
   if (error || deleteError) return `Submission error! ${error.message}`;
+  const createArticle = () => {
+    navigate("create/");
+  }
   return(
       <DashboardLayout>
         <DashboardNavbar absolute isMini />
-        <MDBox mt={8}>
-            <MDBox mb={3}>
-            <Grid container spacing={3}>
-                <Grid item xs={12} lg={8}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} xl={6}></Grid>
+                        <Grid
+                        container
+                        spacing={2}
+                        direction="row"
+                        alignItems="center"
+                        justify="center"
+                        style={{ minHeight: '100vh' }}
+                        >
                         {data.articles.article.map((articleData => (
-                            <Article key={articleData.uuid} ArticleData={articleData}/>
+                             <Grid item xs={3} key={articleData.uuid}>
+                                <Article key={articleData.uuid} ArticleData={articleData}/>
+                            </Grid>
                         )))}
-                        <br/>
-                        <button onClick={() => deleteAllArticles()}>Delete All Articles</button>
-                    </Grid>
-                </Grid>
-                </Grid>
-            </MDBox>
-        </MDBox>
+                        </Grid>
+         <div className="articleOptions">
+            <button onClick={() => createArticle()}>Create Article</button>
+            <button onClick={() => deleteAllArticles()}>Delete All Articles</button>
+            
+         </div>
       </DashboardLayout>
   )
 }

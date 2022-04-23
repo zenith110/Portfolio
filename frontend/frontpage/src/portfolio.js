@@ -1,6 +1,6 @@
 const header = {
   // all the properties are optional - can be left empty or deleted
-  homepage: 'https://abrahannevarez.dev',
+  homepage: process.env.REACT_APP_HOME,
   title: 'Home',
 }
 

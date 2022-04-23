@@ -22,6 +22,7 @@ func FetchArticles() (*model.Articles, error) {
 	if err != nil {
 		fmt.Printf("An error has occured, could not find collection! \nFull error %s", err.Error())
 	}
+	defer cur.Close(context.TODO())
 	var totalArticles int = 0
 	// Find returns a cursor, loop through the values in the cursor
 	for cur.Next(context.TODO()) {
@@ -43,7 +44,6 @@ func FetchArticles() (*model.Articles, error) {
 	// Close the cursor once finished
 	cur.Close(context.TODO())
 
-	
 	return &articles, err
 }
 
@@ -51,7 +51,7 @@ func DeleteArticles() (*model.Article, error) {
 	client := ConnectToMongo()
 	fmt.Print("Connected to mongodb!")
 	if err := client.Database("blog").Collection("articles").Drop(context.TODO()); err != nil {
-    	log.Fatal(err)
+		log.Fatal(err)
 	}
 	var article model.Article
 	var err error

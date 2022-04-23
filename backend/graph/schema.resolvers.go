@@ -8,19 +8,20 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/zenith110/portfilo/graph/generated"
 	"github.com/zenith110/portfilo/graph/model"
 	"github.com/zenith110/portfilo/graph/routes"
 )
 
 func (r *mutationResolver) CreateArticle(ctx context.Context, input *model.CreateArticleInfo) (*model.Article, error) {
-	var err error
 	article, err := routes.CreateArticle(input)
 	return article, err
 }
 
-func (r *mutationResolver) UpdateArticle(ctx context.Context, uuid *string, input *model.UpdatedArticleInfo) (*model.Article, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) UpdateArticle(ctx context.Context, input *model.UpdatedArticleInfo) (*model.Article, error) {
+	article, err := routes.UpdateArticle(input)
+	return article, err
 }
 
 func (r *mutationResolver) DeleteArticle(ctx context.Context, uuid *string) (*model.Article, error) {
@@ -37,8 +38,13 @@ func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Article(ctx context.Context, uuid string) (*model.Article, error) {
+func (r *mutationResolver) UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error) {
 	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Article(ctx context.Context, title string) (*model.Article, error) {
+	article, err := routes.FindArticle(&title)
+	return article, err
 }
 
 func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
@@ -50,6 +56,10 @@ func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjec
 	githubUser := os.Getenv("GITHUBUSER")
 	github, err := routes.FetchProjects(githubUser)
 	return github, err
+}
+
+func (r *queryResolver) GetGalleryImages(ctx context.Context) (*model.Gallery, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.

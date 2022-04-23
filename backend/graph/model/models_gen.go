@@ -2,6 +2,10 @@
 
 package model
 
+import (
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type AccessCode struct {
 	StatusCode    string `json:"statusCode"`
 	AllowedAccess bool   `json:"allowedAccess"`
@@ -9,12 +13,14 @@ type AccessCode struct {
 
 type Article struct {
 	Title       string  `json:"title"`
+	TitleCard   string  `json:"titleCard"`
 	Author      *Author `json:"author"`
 	ContentData string  `json:"contentData"`
 	DateWritten string  `json:"dateWritten"`
 	URL         string  `json:"url"`
 	Description string  `json:"description"`
 	UUID        string  `json:"uuid"`
+	Tags        []Tag   `json:"tags"`
 }
 
 type ArticleTag struct {
@@ -43,13 +49,25 @@ type AuthorInput struct {
 }
 
 type CreateArticleInfo struct {
-	Title       *string `json:"title"`
-	Author      *string `json:"author"`
-	ContentData *string `json:"contentData"`
-	DateWritten *string `json:"dateWritten"`
-	URL         *string `json:"url"`
-	Description *string `json:"description"`
-	UUID        *string `json:"uuid"`
+	Title       *string   `json:"title"`
+	TitleCard   *File     `json:"titleCard"`
+	Author      *string   `json:"author"`
+	ContentData *string   `json:"contentData"`
+	DateWritten *string   `json:"dateWritten"`
+	URL         *string   `json:"url"`
+	Description *string   `json:"description"`
+	UUID        *string   `json:"uuid"`
+	Tags        []TagData `json:"tags"`
+}
+
+type File struct {
+	Name        *string         `json:"name"`
+	FileData    *graphql.Upload `json:"fileData"`
+	ContentType *string         `json:"contentType"`
+}
+
+type Gallery struct {
+	Images []Image `json:"images"`
 }
 
 type GithubProjects struct {
@@ -79,9 +97,18 @@ type Tag struct {
 	Language string `json:"language"`
 }
 
+type TagData struct {
+	Name *string `json:"name"`
+}
+
 type UpdatedArticleInfo struct {
-	Title       *string `json:"title"`
-	ContentData *string `json:"contentData"`
-	URL         *string `json:"url"`
-	Description *string `json:"description"`
+	Title       *string   `json:"title"`
+	TitleCard   *File     `json:"titleCard"`
+	Author      *string   `json:"author"`
+	ContentData *string   `json:"contentData"`
+	DateWritten *string   `json:"dateWritten"`
+	URL         *string   `json:"url"`
+	Description *string   `json:"description"`
+	UUID        *string   `json:"uuid"`
+	Tags        []TagData `json:"tags"`
 }

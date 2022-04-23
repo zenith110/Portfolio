@@ -10,7 +10,7 @@ services:
     restart: always
     container_name: mongodb
     volumes:
-      - ./db:/data/db
+      - mongo_storage:/data/db
   graphql:
     build:
       context: ./backend
@@ -57,6 +57,24 @@ services:
       - .env
     depends_on:
       - graphql
+  mysql:
+    image: mysql
+    restart: unless-stopped
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+  super_tokens:
+    image: registry.supertokens.io/supertokens/supertokens-mysql
+    restart: always
+    container_name: super_tokens
+    env_file:
+      - .env
+    ports:
+      - "3567:3567"
+    depends_on: 
+      - "mysql"
   # configure:
   #   image: quay.io/gravitational/teleport:8
   #   container_name: teleport-configure
@@ -82,3 +100,5 @@ services:
   #     - ./teleport-data:/var/lib/teleport
   #   depends_on:
   #     - configure
+volumes:
+  mongo_storage:
