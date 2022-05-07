@@ -24,8 +24,8 @@ func (r *mutationResolver) UpdateArticle(ctx context.Context, input *model.Updat
 	return article, err
 }
 
-func (r *mutationResolver) DeleteArticle(ctx context.Context, uuid *string) (*model.Article, error) {
-	article, err := routes.DeleteArticle(uuid)
+func (r *mutationResolver) DeleteArticle(ctx context.Context, input *model.DeleteBucketInfo) (*model.Article, error) {
+	article, err := routes.DeleteArticle(input)
 	return article, err
 }
 

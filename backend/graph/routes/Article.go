@@ -33,11 +33,12 @@ func CreateArticle(input *model.CreateArticleInfo) (*model.Article, error) {
 	fmt.Println("Inserted a single document: ", res.InsertedID)
 	return &article, err
 }
-func DeleteArticle(uuid *string) (*model.Article, error) {
+func DeleteArticle(bucket *model.DeleteBucketInfo) (*model.Article, error) {
 	client := ConnectToMongo()
 	collection := client.Database("blog").Collection("articles")
-	article := model.Article{UUID: *uuid}
-	deleteResult, deleteError := collection.DeleteOne(context.TODO(), bson.M{"uuid": *uuid})
+	article := model.Article{UUID: *bucket.UUID}
+	DeleteArticleBucket(*bucket.BucketName)
+	deleteResult, deleteError := collection.DeleteOne(context.TODO(), bson.M{"uuid": *bucket.UUID})
 	if deleteResult.DeletedCount == 0 {
 		log.Fatal("Error on deleting data", deleteError)
 	}

@@ -60,6 +60,11 @@ type CreateArticleInfo struct {
 	Tags        []TagData `json:"tags"`
 }
 
+type DeleteBucketInfo struct {
+	UUID       *string `json:"uuid"`
+	BucketName *string `json:"bucketName"`
+}
+
 type File struct {
 	Name        *string         `json:"name"`
 	FileData    *graphql.Upload `json:"fileData"`

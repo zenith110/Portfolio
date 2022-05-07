@@ -22,6 +22,11 @@ function SlateEditor(value) {
             // Execute the `insertText` method when the event occurs.
             editor.insertText("and");
           }
+          else if(event.key === "|"){
+            event.preventDefault();
+            // Execute the `insertText` method when the event occurs.
+            editor.insertText("and");
+          }
         }}
       />
     </Slate>

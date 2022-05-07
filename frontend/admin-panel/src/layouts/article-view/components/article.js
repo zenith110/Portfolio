@@ -56,8 +56,8 @@ const Article = ({ArticleData}) => {
     }`;
   const [value, setValue] = useState(deserializedData)
   const deleteArticleClient = gql`
-          mutation($uuid: String!){
-          deleteArticle(uuid: $uuid){
+          mutation($DeleteBucket: DeleteBucketInfo){
+          deleteArticle(input: $DeleteBucket){
               uuid
               }
           }
@@ -193,12 +193,16 @@ const Article = ({ArticleData}) => {
         </CardContent>
         <CardActions>
              <input type="image" src={Pencil} alt="Pencil" onClick={handleOpen}/>
-             <input type="image" src={Eraser} alt="Eraser" onClick={() => 
+             <input type="image" src={Eraser} alt="Eraser" onClick={() => {
+                let DeleteBucketInfo = {
+                  uuid: ArticleData.uuid,
+                  bucketName: ArticleData.title
+                }
                 deleteArticle({
                     variables: {
-                        uuid: ArticleData.uuid
+                        DeleteBucket: DeleteBucketInfo
                     },
-                })
+                })}
             }/>
             <Button size="small" onClick={() => window.open(process.env.REACT_APP_BLOG + "/" + ArticleData.url)}>Published: {writtenDate}</Button>
             </CardActions>

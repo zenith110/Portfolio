@@ -41,6 +41,9 @@ import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
 import CreateArticle from "layouts/article-creation";
 import ArticleView from "layouts/article-view";
+import VideosView from "layouts/gallery/videos-view/videos-view";
+import ImagesView from "layouts/gallery/images-view/images-view";
+import Gallery from "layouts/gallery/gallery";
 // @mui icons
 import Icon from "@mui/material/Icon";
 
@@ -59,14 +62,6 @@ const routes = [
     component: <SignIn />,
   },
   {
-    type: "collapse",
-    name: "Sign Out",
-    key: "sign-out",
-    icon: <Icon fontSize="small">assignment</Icon>,
-    route: "/authentication/sign-up",
-    component: <SignUp />,
-  },
-  {
     key: "create-article",
     route: "view/article/create/",
     component: <CreateArticle />,
@@ -78,6 +73,32 @@ const routes = [
     icon: <Icon fontSize="small">text_snippet</Icon>,
     route: "view/article",
     component: <ArticleView />,
+  },
+  {
+    type: "collapse",
+    name: "Gallery",
+    key: "gallery",
+    icon: <Icon fontSize="small">browse_gallery</Icon>,
+    route: "gallery",
+    component: <Gallery />,
+  },
+  {
+    key: "images-view",
+    route: "gallery/images/",
+    component: <ImagesView />,
+  },
+  {
+    key: "videos-view",
+    route: "gallery/videos",
+    component: <VideosView />,
+  },
+  {
+    type: "collapse",
+    name: "Sign Out",
+    key: "sign-out",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/authentication/sign-up",
+    component: <SignUp />,
   },
 ];
 

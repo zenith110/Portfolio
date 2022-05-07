@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/zenith110/portfilo/graph/model"
 	"golang.org/x/image/draw"
@@ -53,7 +54,6 @@ func UploadFileToS3(input *model.CreateArticleInfo) string {
 }
 
 func UploadUpdatedFileToS3(input *model.UpdatedArticleInfo) string {
-	fmt.Print("data is: ", input.TitleCard.FileData.ContentType)
 	session, err := session.NewSession(&aws.Config{
 		Region:      aws.String(os.Getenv("AWS_REGION")),
 		Credentials: credentials.NewStaticCredentials(os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"), ""),
@@ -88,4 +88,23 @@ func UploadUpdatedFileToS3(input *model.UpdatedArticleInfo) string {
 	}
 	url := "https://" + os.Getenv("BLOG_BUCKET") + ".s3." + os.Getenv("AWS_REGION") + ".amazonaws.com/" + *input.URL + "/" + *input.TitleCard.Name
 	return url
+}
+
+func DeleteArticleBucket(bucketName string){
+	session, err := session.NewSession(&aws.Config{
+		Region:      aws.String(os.Getenv("AWS_REGION")),
+		Credentials: credentials.NewStaticCredentials(os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"), ""),
+	})
+	if err != nil {
+		panic(fmt.Errorf("error has occured!\n%v", err))
+	}
+	// Makes an s3 service client
+	s3sc := s3.New(session)
+	iterator := s3manager.NewDeleteListIterator(s3sc, &s3.ListObjectsInput{
+		Bucket: aws.String(bucketName + "/"),
+	})
+	s3Error := s3manager.NewBatchDeleteWithClient(s3sc).Delete(aws.BackgroundContext(), iterator)
+	if s3Error != nil {
+		panic(fmt.Errorf("error has occured!\n%v", err))
+	}
 }

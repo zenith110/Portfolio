@@ -14,10 +14,14 @@ type Mutation {
     input: CreateArticleInfo
   ): Article!
   updateArticle(input: UpdatedArticleInfo): Article!
-  deleteArticle(uuid: String): Article!
+  deleteArticle(input: DeleteBucketInfo): Article!
   deleteAllArticles: Article!
   login(input: LoginUser): AccessCode
   uploadToGallery(image: Upload): Image
+}
+input DeleteBucketInfo{
+  uuid: String
+  bucketName: String
 }
 input CreateArticleInfo{
     title: String

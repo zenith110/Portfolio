@@ -89,7 +89,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateArticle     func(childComplexity int, input *model.CreateArticleInfo) int
 		DeleteAllArticles func(childComplexity int) int
-		DeleteArticle     func(childComplexity int, uuid *string) int
+		DeleteArticle     func(childComplexity int, input *model.DeleteBucketInfo) int
 		Login             func(childComplexity int, input *model.LoginUser) int
 		UpdateArticle     func(childComplexity int, input *model.UpdatedArticleInfo) int
 		UploadToGallery   func(childComplexity int, image *graphql.Upload) int
@@ -120,7 +120,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateArticle(ctx context.Context, input *model.CreateArticleInfo) (*model.Article, error)
 	UpdateArticle(ctx context.Context, input *model.UpdatedArticleInfo) (*model.Article, error)
-	DeleteArticle(ctx context.Context, uuid *string) (*model.Article, error)
+	DeleteArticle(ctx context.Context, input *model.DeleteBucketInfo) (*model.Article, error)
 	DeleteAllArticles(ctx context.Context) (*model.Article, error)
 	Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error)
 	UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error)
@@ -316,7 +316,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteArticle(childComplexity, args["uuid"].(*string)), true
+		return e.complexity.Mutation.DeleteArticle(childComplexity, args["input"].(*model.DeleteBucketInfo)), true
 
 	case "Mutation.login":
 		if e.complexity.Mutation.Login == nil {
@@ -523,10 +523,14 @@ type Mutation {
     input: CreateArticleInfo
   ): Article!
   updateArticle(input: UpdatedArticleInfo): Article!
-  deleteArticle(uuid: String): Article!
+  deleteArticle(input: DeleteBucketInfo): Article!
   deleteAllArticles: Article!
   login(input: LoginUser): AccessCode
   uploadToGallery(image: Upload): Image
+}
+input DeleteBucketInfo{
+  uuid: String
+  bucketName: String
 }
 input CreateArticleInfo{
     title: String
@@ -647,15 +651,15 @@ func (ec *executionContext) field_Mutation_createArticle_args(ctx context.Contex
 func (ec *executionContext) field_Mutation_deleteArticle_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["uuid"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+	var arg0 *model.DeleteBucketInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalODeleteBucketInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐDeleteBucketInfo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["uuid"] = arg0
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1581,7 +1585,7 @@ func (ec *executionContext) _Mutation_deleteArticle(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteArticle(rctx, args["uuid"].(*string))
+		return ec.resolvers.Mutation().DeleteArticle(rctx, args["input"].(*model.DeleteBucketInfo))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3468,6 +3472,37 @@ func (ec *executionContext) unmarshalInputCreateArticleInfo(ctx context.Context,
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeleteBucketInfo(ctx context.Context, obj interface{}) (model.DeleteBucketInfo, error) {
+	var it model.DeleteBucketInfo
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "uuid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uuid"))
+			it.UUID, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "bucketName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bucketName"))
+			it.BucketName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputFile(ctx context.Context, obj interface{}) (model.File, error) {
 	var it model.File
 	asMap := map[string]interface{}{}
@@ -5000,6 +5035,14 @@ func (ec *executionContext) unmarshalOCreateArticleInfo2ᚖgithubᚗcomᚋzenith
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputCreateArticleInfo(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalODeleteBucketInfo2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐDeleteBucketInfo(ctx context.Context, v interface{}) (*model.DeleteBucketInfo, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputDeleteBucketInfo(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
