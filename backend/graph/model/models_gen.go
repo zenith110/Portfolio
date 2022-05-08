@@ -71,7 +71,7 @@ type File struct {
 	ContentType *string         `json:"contentType"`
 }
 
-type Gallery struct {
+type GalleryImages struct {
 	Images []Image `json:"images"`
 }
 
@@ -80,7 +80,10 @@ type GithubProjects struct {
 }
 
 type Image struct {
-	URL string `json:"url"`
+	URL         string `json:"url"`
+	Type        string `json:"type"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type LoginUser struct {

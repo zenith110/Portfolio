@@ -74,7 +74,7 @@ type ComplexityRoot struct {
 		Profile func(childComplexity int) int
 	}
 
-	Gallery struct {
+	GalleryImages struct {
 		Images func(childComplexity int) int
 	}
 
@@ -83,16 +83,19 @@ type ComplexityRoot struct {
 	}
 
 	Image struct {
-		URL func(childComplexity int) int
+		Description func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Type        func(childComplexity int) int
+		URL         func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateArticle     func(childComplexity int, input *model.CreateArticleInfo) int
-		DeleteAllArticles func(childComplexity int) int
-		DeleteArticle     func(childComplexity int, input *model.DeleteBucketInfo) int
-		Login             func(childComplexity int, input *model.LoginUser) int
-		UpdateArticle     func(childComplexity int, input *model.UpdatedArticleInfo) int
-		UploadToGallery   func(childComplexity int, image *graphql.Upload) int
+		CreateArticle        func(childComplexity int, input *model.CreateArticleInfo) int
+		DeleteAllArticles    func(childComplexity int) int
+		DeleteArticle        func(childComplexity int, input *model.DeleteBucketInfo) int
+		Login                func(childComplexity int, input *model.LoginUser) int
+		UpdateArticle        func(childComplexity int, input *model.UpdatedArticleInfo) int
+		UploadToGalleryImage func(childComplexity int, image *model.File) int
 	}
 
 	Project struct {
@@ -123,13 +126,13 @@ type MutationResolver interface {
 	DeleteArticle(ctx context.Context, input *model.DeleteBucketInfo) (*model.Article, error)
 	DeleteAllArticles(ctx context.Context) (*model.Article, error)
 	Login(ctx context.Context, input *model.LoginUser) (*model.AccessCode, error)
-	UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error)
+	UploadToGalleryImage(ctx context.Context, image *model.File) (*model.Image, error)
 }
 type QueryResolver interface {
 	Article(ctx context.Context, title string) (*model.Article, error)
 	Articles(ctx context.Context) (*model.Articles, error)
 	GithubProjects(ctx context.Context) (*model.GithubProjects, error)
-	GetGalleryImages(ctx context.Context) (*model.Gallery, error)
+	GetGalleryImages(ctx context.Context) (*model.GalleryImages, error)
 }
 
 type executableSchema struct {
@@ -266,12 +269,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Author.Profile(childComplexity), true
 
-	case "Gallery.images":
-		if e.complexity.Gallery.Images == nil {
+	case "GalleryImages.images":
+		if e.complexity.GalleryImages.Images == nil {
 			break
 		}
 
-		return e.complexity.Gallery.Images(childComplexity), true
+		return e.complexity.GalleryImages.Images(childComplexity), true
 
 	case "GithubProjects.projects":
 		if e.complexity.GithubProjects.Projects == nil {
@@ -279,6 +282,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.GithubProjects.Projects(childComplexity), true
+
+	case "Image.description":
+		if e.complexity.Image.Description == nil {
+			break
+		}
+
+		return e.complexity.Image.Description(childComplexity), true
+
+	case "Image.name":
+		if e.complexity.Image.Name == nil {
+			break
+		}
+
+		return e.complexity.Image.Name(childComplexity), true
+
+	case "Image.type":
+		if e.complexity.Image.Type == nil {
+			break
+		}
+
+		return e.complexity.Image.Type(childComplexity), true
 
 	case "Image.url":
 		if e.complexity.Image.URL == nil {
@@ -342,17 +366,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateArticle(childComplexity, args["input"].(*model.UpdatedArticleInfo)), true
 
-	case "Mutation.uploadToGallery":
-		if e.complexity.Mutation.UploadToGallery == nil {
+	case "Mutation.uploadToGalleryImage":
+		if e.complexity.Mutation.UploadToGalleryImage == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadToGallery_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_uploadToGalleryImage_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UploadToGallery(childComplexity, args["image"].(*graphql.Upload)), true
+		return e.complexity.Mutation.UploadToGalleryImage(childComplexity, args["image"].(*model.File)), true
 
 	case "Project.createdon":
 		if e.complexity.Project.Createdon == nil {
@@ -516,7 +540,7 @@ type Query {
   article(title: String!): Article
   articles: Articles
   githubProjects: GithubProjects
-  getGalleryImages: Gallery
+  getGalleryImages: GalleryImages
 }
 type Mutation {
   createArticle(
@@ -526,7 +550,7 @@ type Mutation {
   deleteArticle(input: DeleteBucketInfo): Article!
   deleteAllArticles: Article!
   login(input: LoginUser): AccessCode
-  uploadToGallery(image: Upload): Image
+  uploadToGalleryImage(image: File): Image
 }
 input DeleteBucketInfo{
   uuid: String
@@ -569,6 +593,9 @@ type AccessCode {
 }
 type Image {
   url: String!
+  type: String!
+  name: String!
+  description: String!
 }
 
 input LoginUser {
@@ -580,7 +607,7 @@ input AuthorInput {
   profile: String!
   picture: String!
 }
-type Gallery{
+type GalleryImages{
   images: [Image!]!
 }
 type Author {
@@ -693,13 +720,13 @@ func (ec *executionContext) field_Mutation_updateArticle_args(ctx context.Contex
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_uploadToGallery_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_uploadToGalleryImage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *graphql.Upload
+	var arg0 *model.File
 	if tmp, ok := rawArgs["image"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
-		arg0, err = ec.unmarshalOUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+		arg0, err = ec.unmarshalOFile2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐFile(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1371,7 +1398,7 @@ func (ec *executionContext) _Author_picture(ctx context.Context, field graphql.C
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Gallery_images(ctx context.Context, field graphql.CollectedField, obj *model.Gallery) (ret graphql.Marshaler) {
+func (ec *executionContext) _GalleryImages_images(ctx context.Context, field graphql.CollectedField, obj *model.GalleryImages) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1379,7 +1406,7 @@ func (ec *executionContext) _Gallery_images(ctx context.Context, field graphql.C
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "Gallery",
+		Object:     "GalleryImages",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -1460,6 +1487,111 @@ func (ec *executionContext) _Image_url(ctx context.Context, field graphql.Collec
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_type(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_name(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Image_description(ctx context.Context, field graphql.CollectedField, obj *model.Image) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Image",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1676,7 +1808,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	return ec.marshalOAccessCode2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐAccessCode(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_uploadToGallery(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_uploadToGalleryImage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1693,7 +1825,7 @@ func (ec *executionContext) _Mutation_uploadToGallery(ctx context.Context, field
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_uploadToGallery_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_uploadToGalleryImage_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1701,7 +1833,7 @@ func (ec *executionContext) _Mutation_uploadToGallery(ctx context.Context, field
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UploadToGallery(rctx, args["image"].(*graphql.Upload))
+		return ec.resolvers.Mutation().UploadToGalleryImage(rctx, args["image"].(*model.File))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2090,9 +2222,9 @@ func (ec *executionContext) _Query_getGalleryImages(ctx context.Context, field g
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Gallery)
+	res := resTmp.(*model.GalleryImages)
 	fc.Result = res
-	return ec.marshalOGallery2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGallery(ctx, field.Selections, res)
+	return ec.marshalOGalleryImages2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGalleryImages(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3886,19 +4018,19 @@ func (ec *executionContext) _Author(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
-var galleryImplementors = []string{"Gallery"}
+var galleryImagesImplementors = []string{"GalleryImages"}
 
-func (ec *executionContext) _Gallery(ctx context.Context, sel ast.SelectionSet, obj *model.Gallery) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, galleryImplementors)
+func (ec *executionContext) _GalleryImages(ctx context.Context, sel ast.SelectionSet, obj *model.GalleryImages) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, galleryImagesImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Gallery")
+			out.Values[i] = graphql.MarshalString("GalleryImages")
 		case "images":
-			out.Values[i] = ec._Gallery_images(ctx, field, obj)
+			out.Values[i] = ec._GalleryImages_images(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3956,6 +4088,21 @@ func (ec *executionContext) _Image(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "type":
+			out.Values[i] = ec._Image_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Image_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "description":
+			out.Values[i] = ec._Image_description(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4004,8 +4151,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "login":
 			out.Values[i] = ec._Mutation_login(ctx, field)
-		case "uploadToGallery":
-			out.Values[i] = ec._Mutation_uploadToGallery(ctx, field)
+		case "uploadToGalleryImage":
+			out.Values[i] = ec._Mutation_uploadToGalleryImage(ctx, field)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5054,11 +5201,11 @@ func (ec *executionContext) unmarshalOFile2ᚖgithubᚗcomᚋzenith110ᚋportfil
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOGallery2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGallery(ctx context.Context, sel ast.SelectionSet, v *model.Gallery) graphql.Marshaler {
+func (ec *executionContext) marshalOGalleryImages2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGalleryImages(ctx context.Context, sel ast.SelectionSet, v *model.GalleryImages) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	return ec._Gallery(ctx, sel, v)
+	return ec._GalleryImages(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOGithubProjects2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐGithubProjects(ctx context.Context, sel ast.SelectionSet, v *model.GithubProjects) graphql.Marshaler {

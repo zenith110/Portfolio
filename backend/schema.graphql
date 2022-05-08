@@ -7,7 +7,7 @@ type Query {
   article(title: String!): Article
   articles: Articles
   githubProjects: GithubProjects
-  getGalleryImages: Gallery
+  getGalleryImages: GalleryImages
 }
 type Mutation {
   createArticle(
@@ -17,7 +17,7 @@ type Mutation {
   deleteArticle(input: DeleteBucketInfo): Article!
   deleteAllArticles: Article!
   login(input: LoginUser): AccessCode
-  uploadToGallery(image: Upload): Image
+  uploadToGalleryImage(image: File): Image
 }
 input DeleteBucketInfo{
   uuid: String
@@ -38,6 +38,7 @@ input File{
   name: String
   fileData: Upload
   contentType: String
+  description: String
 }
 input TagData{
   name: String
@@ -60,6 +61,9 @@ type AccessCode {
 }
 type Image {
   url: String!
+  type: String!
+  name: String!
+  description: String!
 }
 
 input LoginUser {
@@ -71,7 +75,7 @@ input AuthorInput {
   profile: String!
   picture: String!
 }
-type Gallery{
+type GalleryImages{
   images: [Image!]!
 }
 type Author {

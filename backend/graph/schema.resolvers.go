@@ -38,7 +38,7 @@ func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error) {
+func (r *mutationResolver) UploadToGalleryImage(ctx context.Context, image *model.File) (*model.Image, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -58,7 +58,7 @@ func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjec
 	return github, err
 }
 
-func (r *queryResolver) GetGalleryImages(ctx context.Context) (*model.Gallery, error) {
+func (r *queryResolver) GetGalleryImages(ctx context.Context) (*model.GalleryImages, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -70,3 +70,13 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error) {
+	panic(fmt.Errorf("not implemented"))
+}

@@ -5,7 +5,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import { gql, useQuery, useMutation, NetworkStatus} from "@apollo/client";
+import { gql, useQuery, useMutation} from "@apollo/client";
 import Grid from "@mui/material/Grid";
 import Article from "./components/article";
 import "./article-view.css"

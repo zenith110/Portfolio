@@ -89,7 +89,7 @@ const routes = [
   },
   {
     key: "videos-view",
-    route: "gallery/videos",
+    route: "gallery/videos/",
     component: <VideosView />,
   },
   {
