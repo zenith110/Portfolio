@@ -39,6 +39,7 @@ input File{
   fileData: Upload
   contentType: String
   description: String
+  url: String
 }
 input TagData{
   name: String

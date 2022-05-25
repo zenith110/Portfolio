@@ -69,6 +69,8 @@ type File struct {
 	Name        *string         `json:"name"`
 	FileData    *graphql.Upload `json:"fileData"`
 	ContentType *string         `json:"contentType"`
+	Description *string         `json:"description"`
+	URL         *string         `json:"url"`
 }
 
 type GalleryImages struct {
