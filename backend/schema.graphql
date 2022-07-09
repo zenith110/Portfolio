@@ -5,10 +5,10 @@ schema {
 }
 type Query {
   article(title: String!): Article
-  articles(keyword: String!): Articles
+  articles: Articles
+  zincarticles(keyword: String!): Articles
   githubProjects: GithubProjects
   getGalleryImages: GalleryImages
-  getArticlesZinc: Articles
 }
 type Mutation {
   createArticle(

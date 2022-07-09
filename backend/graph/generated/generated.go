@@ -110,10 +110,11 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Article          func(childComplexity int, title string) int
-		Articles         func(childComplexity int, keyword string) int
+		Articles         func(childComplexity int) int
 		GetArticlesZinc  func(childComplexity int) int
 		GetGalleryImages func(childComplexity int) int
 		GithubProjects   func(childComplexity int) int
+		Zincarticles     func(childComplexity int, keyword string) int
 	}
 
 	Tag struct {
@@ -130,7 +131,8 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Article(ctx context.Context, title string) (*model.Article, error)
-	Articles(ctx context.Context, keyword string) (*model.Articles, error)
+	Articles(ctx context.Context) (*model.Articles, error)
+	Zincarticles(ctx context.Context, keyword string) (*model.Articles, error)
 	GithubProjects(ctx context.Context) (*model.GithubProjects, error)
 	GetGalleryImages(ctx context.Context) (*model.GalleryImages, error)
 	GetArticlesZinc(ctx context.Context) (*model.Articles, error)
@@ -440,12 +442,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_articles_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Articles(childComplexity, args["keyword"].(string)), true
+		return e.complexity.Query.Articles(childComplexity), true
 
 	case "Query.getArticlesZinc":
 		if e.complexity.Query.GetArticlesZinc == nil {
@@ -467,6 +464,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.GithubProjects(childComplexity), true
+
+	case "Query.zincarticles":
+		if e.complexity.Query.Zincarticles == nil {
+			break
+		}
+
+		args, err := ec.field_Query_zincarticles_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Zincarticles(childComplexity, args["keyword"].(string)), true
 
 	case "Tag.language":
 		if e.complexity.Tag.Language == nil {
@@ -546,7 +555,8 @@ schema {
 }
 type Query {
   article(title: String!): Article
-  articles(keyword: String!): Articles
+  articles: Articles
+  zincarticles(keyword: String!): Articles
   githubProjects: GithubProjects
   getGalleryImages: GalleryImages
   getArticlesZinc: Articles
@@ -761,7 +771,7 @@ func (ec *executionContext) field_Query_article_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_articles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_zincarticles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -2154,8 +2164,40 @@ func (ec *executionContext) _Query_articles(ctx context.Context, field graphql.C
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Articles(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Articles)
+	fc.Result = res
+	return ec.marshalOArticles2ᚖgithubᚗcomᚋzenith110ᚋportfiloᚋgraphᚋmodelᚐArticles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_zincarticles(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_articles_args(ctx, rawArgs)
+	args, err := ec.field_Query_zincarticles_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -2163,7 +2205,7 @@ func (ec *executionContext) _Query_articles(ctx context.Context, field graphql.C
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Articles(rctx, args["keyword"].(string))
+		return ec.resolvers.Query().Zincarticles(rctx, args["keyword"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4321,6 +4363,17 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_articles(ctx, field)
+				return res
+			})
+		case "zincarticles":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_zincarticles(ctx, field)
 				return res
 			})
 		case "githubProjects":

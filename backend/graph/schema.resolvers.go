@@ -42,8 +42,13 @@ func (r *queryResolver) Article(ctx context.Context, title string) (*model.Artic
 	return article, err
 }
 
-func (r *queryResolver) Articles(ctx context.Context, keyword string) (*model.Articles, error) {
-	articles, err := routes.FetchArticles(keyword)
+func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
+	articles, err := routes.FetchArticles()
+	return articles, err
+}
+
+func (r *queryResolver) Zincarticles(ctx context.Context, keyword string) (*model.Articles, error) {
+	articles, err := routes.FetchArticlesZinc(keyword)
 	return articles, err
 }
 

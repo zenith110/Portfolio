@@ -4,10 +4,10 @@ import { gql, useQuery } from "@apollo/client";
 import ArticleSection from './ArticleSection';
 
 const DataConnect = ({ keyword }) => {
-    console.log(keyword)
+    const [currentArticles, setCurrentArticles] = useState([])
     const articleViewQuery = gql`
     query($keyword: String!){
-    articles(keyword: $keyword){
+    zincarticles(keyword: $keyword){
         article{
         title
         titleCard
@@ -32,13 +32,14 @@ const DataConnect = ({ keyword }) => {
             keyword
         }
     });
-    if (loading) {
-        return <p>Loading Graphql data...</p>
-    }
+    // if (loading) {
+    //     return <p>Loading Graphql data...</p>
+    // }
     // eslint-disable-next-line no-return-assign
     if (error) return `Could not load articles! ${error.message}`;
     const articles = []
-    data.articles.article.map((articleData) =>
+    try{
+    data.zincarticles.article.map((articleData) =>
         articles.push({
             title: articleData.title,
             titleCard: articleData.titleCard,
@@ -53,11 +54,14 @@ const DataConnect = ({ keyword }) => {
             uuid: articleData.uuid
         })
     )
-    console.log(articles)
-    // const [currentArticles, setCurrentArticles] = useState(articles)
+    }
+    catch{
+        console.log("Got undefined!")
+    }
+    
     return (
         <div>
-            {/* <ArticleSection key={uniqid()} articles={currentArticles} /> */}
+            <ArticleSection key={uniqid()} articles={articles} />
         </div>
     )
 }

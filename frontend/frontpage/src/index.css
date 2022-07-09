@@ -13,6 +13,10 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior: none;
+}
+body {
+  border: 0px solid transparent;
 }
 
 h1,
@@ -56,3 +60,4 @@ button {
     font-size: 2.6rem;
   }
 }
+

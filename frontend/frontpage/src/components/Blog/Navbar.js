@@ -109,7 +109,7 @@ const Navbar = () => {
             Blog
           </a>
         </li>
-        <button className='nav__list-item' onClick={handleOpen}>Filter Articles</button>
+        {/* <button className='nav__list-item' onClick={handleOpen}>Filter Articles</button> */}
       </ul>
       <button
         type='button'

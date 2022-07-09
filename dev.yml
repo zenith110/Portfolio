@@ -1,12 +1,12 @@
 version: "3"
 
 services:
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - 4000:4000
-    volumes:
-      - ./grafana:/var/lib/grafana
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - 4000:4000
+  #   volumes:
+  #     - ./grafana:/var/lib/grafana
   mongo:
     image: mongo
     restart: always
