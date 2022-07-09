@@ -1,22 +1,21 @@
 import { useState } from "react";
-import { TextField } from "@mui/material";
-import Box from '@mui/material/Box';
+import { Grid, TextField } from "@mui/material";
+
 import Header from "./Header";
 import Footer from '../Footer/Footer'
 import './Autocomplete.css'
 import DataConnect from "./DataConnect";
 const AutoComplete = () => {
-    const [suggestion, setSuggestion] = useState("")
-    const [articles, setArticles] = useState({})
-    console.log(suggestion);
+    const [suggestion, setSuggestion] = useState("");
     return (
         <>
             <Header />
-            <Box sx={{ input: { textAlign: "center" } }}>
-                <input type="text"
-                    onChange={(e) => setSuggestion(e.target.value)} value={suggestion} placeholder="article"/>
-            </Box>
+            <Grid container direction="column" alignItems="center" justifyContent="center">
+                <TextField id="filled-basic" label="articles" variant="filled" type="text" onChange={(e) => setSuggestion(e.target.value)} value={suggestion} />
+            </Grid>
+            <div style={{margin: "20px"}}>
             <DataConnect keyword={suggestion} />
+            </div>
             <Footer />
         </>
     )
