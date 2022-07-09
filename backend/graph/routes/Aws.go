@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -13,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
+	"github.com/google/uuid"
 	"github.com/zenith110/portfilo/graph/model"
 	"golang.org/x/image/draw"
 )
@@ -32,25 +34,32 @@ func UploadFileToS3(input *model.CreateArticleInfo) string {
 		panic(fmt.Errorf("error has occured!\n%v", err))
 	}
 	var buffer bytes.Buffer
+	fmt.Println(*input.TitleCard.ContentType)
 	switch *input.TitleCard.ContentType {
-	case "png":
+	case "image/png":
 		newImage := ImageScale(srcImage)
 		err = png.Encode(&buffer, newImage)
 		if err != nil {
 			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
 		}
-	case "jpeg":
+	case "image/jpeg":
 		newImage := ImageScale(srcImage)
 		options := jpeg.Options{
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
-	case "jpg":
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
+	case "image/jpg":
 		newImage := ImageScale(srcImage)
 		options := jpeg.Options{
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
 	}
 
 	finalImage := bytes.NewReader(buffer.Bytes())
@@ -66,6 +75,15 @@ func UploadFileToS3(input *model.CreateArticleInfo) string {
 		panic(fmt.Errorf("error has occured! %s", err))
 	}
 	url := "https://" + os.Getenv("BLOG_BUCKET") + ".s3." + os.Getenv("AWS_REGION") + ".amazonaws.com/" + *input.URL + "/" + *input.TitleCard.Name
+	image := model.Image{URL: *input.URL, Type: *input.TitleCard.ContentType, Name: *input.TitleCard.Name, UUID: uuid.NewString()}
+	UploadImageDB(image, url)
+
+	zincData := `{
+		"Url":  *input.URL,
+		"Type": *input.TitleCard.ContentType,
+		"Name": *input.TitleCard.Name,
+	}`
+	CreateDocument("images", zincData, *input.UUID)
 	return url
 }
 
@@ -97,12 +115,18 @@ func UploadUpdatedFileToS3(input *model.UpdatedArticleInfo) string {
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
 	case "jpg":
 		newImage := ImageScale(srcImage)
 		options := jpeg.Options{
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
 	}
 	finalImage := bytes.NewReader(buffer.Bytes())
 	_, err = s3ConnectionUploader.Upload(&s3manager.UploadInput{
@@ -126,17 +150,19 @@ func DeleteArticleBucket(bucketName string) {
 		Credentials: credentials.NewStaticCredentials(os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"), ""),
 	})
 	if err != nil {
-		panic(fmt.Errorf("error has occured!\n%v", err))
+		panic(fmt.Errorf("session connection error has occured!\n%v", err))
 	}
 	// Makes an s3 service client
 	s3sc := s3.New(session)
+
 	iterator := s3manager.NewDeleteListIterator(s3sc, &s3.ListObjectsInput{
-		Bucket: aws.String(bucketName + "/"),
+		Bucket: aws.String(os.Getenv("BLOG_BUCKET")),
+		Prefix: aws.String(bucketName + "/"),
 	})
-	s3Error := s3manager.NewBatchDeleteWithClient(s3sc).Delete(aws.BackgroundContext(), iterator)
-	if s3Error != nil {
-		panic(fmt.Errorf("error has occured!\n%v", err))
+	if err := s3manager.NewBatchDeleteWithClient(s3sc).Delete(context.Background(), iterator); err != nil {
+		panic(fmt.Errorf("unable to delete objects from bucket %q, %v", bucketName, err))
 	}
+
 }
 func ImageScale(srcImage image.Image) *image.RGBA {
 	newImage := image.NewRGBA(image.Rect(0, 0, 345, 140))
@@ -144,6 +170,7 @@ func ImageScale(srcImage image.Image) *image.RGBA {
 	return newImage
 }
 func UploadToGallery(file *model.File) string {
+
 	session, err := session.NewSession(&aws.Config{
 		Region:      aws.String(os.Getenv("AWS_REGION")),
 		Credentials: credentials.NewStaticCredentials(os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"), ""),
@@ -159,24 +186,30 @@ func UploadToGallery(file *model.File) string {
 	}
 	var buffer bytes.Buffer
 	switch *file.ContentType {
-	case "png":
+	case "image/png":
 		newImage := ImageScale(srcImage)
 		err = png.Encode(&buffer, newImage)
 		if err != nil {
 			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
 		}
-	case "jpeg":
+	case "image/jpeg":
 		newImage := ImageScale(srcImage)
 		options := jpeg.Options{
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
-	case "jpg":
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
+	case "image/jpg":
 		newImage := ImageScale(srcImage)
 		options := jpeg.Options{
 			Quality: 100,
 		}
 		err = jpeg.Encode(&buffer, newImage, &options)
+		if err != nil {
+			panic(fmt.Errorf("error has occured! could not convert image to png\n%v", err))
+		}
 
 	}
 
@@ -193,5 +226,15 @@ func UploadToGallery(file *model.File) string {
 		panic(fmt.Errorf("error has occured! %s", err))
 	}
 	url := "https://" + os.Getenv("BLOG_BUCKET") + ".s3." + os.Getenv("AWS_REGION") + ".amazonaws.com/" + *file.URL + "/" + *file.Name
+	image := model.Image{URL: url, Type: *file.ContentType, Name: *file.Name, UUID: uuid.NewString()}
+	UploadImageDB(image, url)
+	uuid := uuid.New()
+	zincData := `{
+		"Url":  url,
+		"Type": *file.ContentType,
+		"Name": *file.Name,
+	}`
+
+	CreateDocument("images", zincData, uuid.String())
 	return url
 }

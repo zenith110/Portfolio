@@ -22,49 +22,49 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-const Navbar = ({articles, tags, setCurrentArticles }) => {
+const Navbar = () => {
   const [{ themeName, toggleTheme }] = useContext(ThemeContext)
   const [showNavList, setShowNavList] = useState(false)
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false)
-  const [checkedState, setCheckedState] = useState([])
+  // const [checkedState, setCheckedState] = useState([])
   const toggleNavList = () => setShowNavList(!showNavList)
-    const addInput = (e, tag) => {
-    checkedState.push(tag)
-    setCheckedState(checkedState)
-  }
-  const filterArticles = () => {
-      if(checkedState.length <= 0 || checkedState === undefined){
-          setCurrentArticles(articles)
-          handleClose()
-      }
-      else if(checkedState !== undefined || checkedState.length > 0){
-        const filteredArticlesStorage = []
-        articles.filter((element) =>
-            element.tags.map((tag) => {
-                if(checkedState.includes(tag.language)){
-                    filteredArticlesStorage.push(element)
-                }
-            }
-            )
-        )
+  //   const addInput = (e, tag) => {
+  //   checkedState.push(tag)
+  //   setCheckedState(checkedState)
+  // }
+//   const filterArticles = () => {
+//       if(checkedState.length <= 0 || checkedState === undefined){
+//           setCurrentArticles(articles)
+//           handleClose()
+//       }
+//       else if(checkedState !== undefined || checkedState.length > 0){
+//         const filteredArticlesStorage = []
+//         articles.filter((element) =>
+//             element.tags.map((tag) => {
+//                 if(checkedState.includes(tag.language)){
+//                     filteredArticlesStorage.push(element)
+//                 }
+//             }
+//             )
+//         )
 
-        const filteredArticles = [...new Set(filteredArticlesStorage)]
-        setCheckedState([])
-        setCurrentArticles(filteredArticles)
-        handleClose()
-  }
-}
+//         const filteredArticles = [...new Set(filteredArticlesStorage)]
+//         setCheckedState([])
+//         setCurrentArticles(filteredArticles)
+//         handleClose()
+//   }
+// }
   return (
     <nav className='center nav'>
-      <Modal
+      {/* <Modal
           open={open}
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
-        >
-        <Box sx={style}>
+        > */}
+        {/* <Box sx={style}>
          <p style={{textAlign: "center"}}>Filter articles by keywords</p>
            {tags && (
             <ul className='project__stack'>
@@ -77,7 +77,7 @@ const Navbar = ({articles, tags, setCurrentArticles }) => {
             )}
            <button onClick={filterArticles} key="filteringButton" className='center margin-auto'>Close</button>
         </Box>
-      </Modal>
+      </Modal> */}
       <ul
         style={{ display: showNavList ? 'flex' : null }}
         className='nav__list'

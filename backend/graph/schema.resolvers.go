@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/zenith110/portfilo/graph/generated"
 	"github.com/zenith110/portfilo/graph/model"
 	"github.com/zenith110/portfilo/graph/routes"
@@ -38,17 +37,13 @@ func (r *mutationResolver) Login(ctx context.Context, input *model.LoginUser) (*
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UploadToGalleryImage(ctx context.Context, image *model.File) (*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-
 func (r *queryResolver) Article(ctx context.Context, title string) (*model.Article, error) {
 	article, err := routes.FindArticle(&title)
 	return article, err
 }
 
-func (r *queryResolver) Articles(ctx context.Context) (*model.Articles, error) {
-	articles, err := routes.FetchArticles()
+func (r *queryResolver) Articles(ctx context.Context, keyword string) (*model.Articles, error) {
+	articles, err := routes.FetchArticles(keyword)
 	return articles, err
 }
 
@@ -59,6 +54,11 @@ func (r *queryResolver) GithubProjects(ctx context.Context) (*model.GithubProjec
 }
 
 func (r *queryResolver) GetGalleryImages(ctx context.Context) (*model.GalleryImages, error) {
+	images, err := routes.GalleryFindImages()
+	return images, err
+}
+
+func (r *queryResolver) GetArticlesZinc(ctx context.Context) (*model.Articles, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
@@ -77,6 +77,7 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) UploadToGallery(ctx context.Context, image *graphql.Upload) (*model.Image, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) UploadToGalleryImage(ctx context.Context, image *model.File) (string, error) {
+	url, err := routes.UploadImageGallery(image)
+	return url, err
 }

@@ -5,9 +5,10 @@ schema {
 }
 type Query {
   article(title: String!): Article
-  articles: Articles
+  articles(keyword: String!): Articles
   githubProjects: GithubProjects
   getGalleryImages: GalleryImages
+  getArticlesZinc: Articles
 }
 type Mutation {
   createArticle(
@@ -17,7 +18,6 @@ type Mutation {
   deleteArticle(input: DeleteBucketInfo): Article!
   deleteAllArticles: Article!
   login(input: LoginUser): AccessCode
-  uploadToGalleryImage(image: File): Image
 }
 input DeleteBucketInfo{
   uuid: String
@@ -61,10 +61,10 @@ type AccessCode {
   allowedAccess: Boolean!
 }
 type Image {
+  uuid: String!
   url: String!
   type: String!
   name: String!
-  description: String!
 }
 
 input LoginUser {
@@ -78,6 +78,7 @@ input AuthorInput {
 }
 type GalleryImages{
   images: [Image!]!
+  total: Int!
 }
 type Author {
   name: String!

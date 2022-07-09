@@ -75,6 +75,7 @@ type File struct {
 
 type GalleryImages struct {
 	Images []Image `json:"images"`
+	Total  int     `json:"total"`
 }
 
 type GithubProjects struct {
@@ -82,10 +83,10 @@ type GithubProjects struct {
 }
 
 type Image struct {
-	URL         string `json:"url"`
-	Type        string `json:"type"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	UUID string `json:"uuid"`
+	URL  string `json:"url"`
+	Type string `json:"type"`
+	Name string `json:"name"`
 }
 
 type LoginUser struct {

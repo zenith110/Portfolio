@@ -1,16 +1,63 @@
 import uniqid from 'uniqid'
 import { useState } from 'react'
-import Header from "./Header"
-import Footer from '../Footer/Footer'
+import { gql, useQuery } from "@apollo/client";
 import ArticleSection from './ArticleSection';
 
-const DataConnect = ({articles, filteredTags}) => {
-    const [currentArticles, setCurrentArticles] = useState(articles)
-    return(
+const DataConnect = ({ keyword }) => {
+    console.log(keyword)
+    const articleViewQuery = gql`
+    query($keyword: String!){
+    articles(keyword: $keyword){
+        article{
+        title
+        titleCard
+        uuid
+        author{
+            name
+        }
+        contentData
+        dateWritten
+        url
+        description
+        tags{
+          language
+        }
+        }
+    }
+    }`;
+
+
+    const { data, loading, error } = useQuery(articleViewQuery, {
+        variables: {
+            keyword
+        }
+    });
+    if (loading) {
+        return <p>Loading Graphql data...</p>
+    }
+    // eslint-disable-next-line no-return-assign
+    if (error) return `Could not load articles! ${error.message}`;
+    const articles = []
+    data.articles.article.map((articleData) =>
+        articles.push({
+            title: articleData.title,
+            titleCard: articleData.titleCard,
+            author: {
+                name: articleData.author.name
+            },
+            contentData: articleData.contentData,
+            dateWritten: articleData.dateWritten,
+            url: articleData.url,
+            description: articleData.description,
+            tags: articleData.tags,
+            uuid: articleData.uuid
+        })
+    )
+    console.log(articles)
+    // const [currentArticles, setCurrentArticles] = useState(articles)
+    return (
         <div>
-            <Header articles={articles} tags={filteredTags} setCurrentArticles={setCurrentArticles} currentArticles={currentArticles}/>
-            <ArticleSection key={uniqid()} articles={currentArticles} tags={filteredTags}/>
-            <Footer />
+            {/* <ArticleSection key={uniqid()} articles={currentArticles} /> */}
         </div>
     )
 }

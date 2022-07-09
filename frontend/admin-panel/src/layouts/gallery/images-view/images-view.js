@@ -10,8 +10,8 @@ const ImagesView = () => {
         images{
             url 
             type 
-            name 
-            description
+            name
+            uuid
         }
     }
     }`;
@@ -20,6 +20,7 @@ const ImagesView = () => {
         return <p>Loading Graphql data...</p>
     }
     if (error) return `Submission error! ${error.message}`;
+    console.log(data);
     return(
          <DashboardLayout>
         <DashboardNavbar absolute isMini />
@@ -32,7 +33,7 @@ const ImagesView = () => {
             style={{ minHeight: '100vh' }}
             >
               {data.getGalleryImages.images.map((image) => 
-                  <ImageCard image={image}/>
+                  <ImageCard image={image} key={image.uuid}/>
               )}
             </Grid>
         </DashboardLayout>

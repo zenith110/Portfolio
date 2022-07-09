@@ -5,12 +5,14 @@ services:
     image: grafana/grafana:latest
     ports:
       - 4000:4000
+    volumes:
+      - ./grafana:/var/lib/grafana
   mongo:
     image: mongo
     restart: always
     container_name: mongodb
     volumes:
-      - mongo_storage:/data/db
+      - ./mongo:/data/db
   graphql:
     build:
       context: ./backend
@@ -57,24 +59,32 @@ services:
       - .env
     depends_on:
       - graphql
-  mysql:
-    image: mysql
-    restart: unless-stopped
-    container_name: mysql
+  # mysql:
+  #   image: arm64v8/mysql:oracle
+  #   restart: unless-stopped
+  #   container_name: mysql
+  #   ports:
+  #     - "3306:3306"
+  #   env_file:
+  #     - .env
+  # super_tokens:
+  #   image: registry.supertokens.io/supertokens/supertokens-mysql
+  #   restart: always
+  #   container_name: super_tokens
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "3567:3567"
+  #   depends_on: 
+  #     - "mysql"
+  zinc:
+    image: public.ecr.aws/h9e2j3o7/zinc:latest
+    volumes:
+      - ./zinc:/data
     ports:
-      - "3306:3306"
+      - "4080:4080"
     env_file:
       - .env
-  super_tokens:
-    image: registry.supertokens.io/supertokens/supertokens-mysql
-    restart: always
-    container_name: super_tokens
-    env_file:
-      - .env
-    ports:
-      - "3567:3567"
-    depends_on: 
-      - "mysql"
   # configure:
   #   image: quay.io/gravitational/teleport:8
   #   container_name: teleport-configure

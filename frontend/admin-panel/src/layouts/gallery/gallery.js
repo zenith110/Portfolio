@@ -6,11 +6,11 @@ import "./gallery.css"
 const Gallery = () => {
     const navigate = useNavigate()
     const imagesView = () => {
-        console.log("ayo?")
-        navigate("images/");
+        console.log("Clicking the images portion of the gallery");
+        navigate("gallery/images/");
     }
     const videosView = () => {
-        navigate("videos/");
+        navigate("gallery/videos/");
     }
     return(
      <DashboardLayout>

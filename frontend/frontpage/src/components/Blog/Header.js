@@ -2,7 +2,7 @@ import { header } from '../../portfolio'
 import Navbar from './Navbar'
 import './Header.css'
 
-const Header = ({ articles, tags, setCurrentArticles }) => {
+const Header = () => {
   const { homepage, title } = header
   return (
     <header className='header center'>
@@ -15,7 +15,7 @@ const Header = ({ articles, tags, setCurrentArticles }) => {
           title
         )}
       </h3>
-      <Navbar articles={articles} tags={tags} setCurrentArticles={setCurrentArticles}/>
+      <Navbar/>
     </header>
   )
 }
