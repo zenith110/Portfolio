@@ -1,16 +1,6 @@
 version: "3"
 
 services:
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - 4000:4000
-  mongo:
-    image: mongo
-    restart: always
-    container_name: mongodb
-    volumes:
-      - mongo_storage:/data/db
   graphql:
     build:
       context: ./backend
@@ -40,65 +30,4 @@ services:
       - .env
     depends_on:
       - graphql
-  admin:
-    build:
-      context: ./frontend/admin-panel
-      dockerfile: dev.dockerfile
-    container_name: admin
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    volumes:
-      - /app/node_modules
-      - ./frontend/admin-panel:/home/app/admin-tool
-    env_file:
-      - .env
-    depends_on:
-      - graphql
-  mysql:
-    image: mysql
-    restart: unless-stopped
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    env_file:
-      - .env
-  super_tokens:
-    image: registry.supertokens.io/supertokens/supertokens-mysql
-    restart: always
-    container_name: super_tokens
-    env_file:
-      - .env
-    ports:
-      - "3567:3567"
-    depends_on: 
-      - "mysql"
-  # configure:
-  #   image: quay.io/gravitational/teleport:8
-  #   container_name: teleport-configure
-  #   entrypoint: /bin/sh
-  #   hostname: teleport.abrahannevarez.dev
-  #   command: -c "if [ ! -f /etc/teleport/teleport.yaml ]; then teleport configure > /etc/teleport/teleport.yaml; fi"
-  #   volumes:
-  #     - ./teleport-config:/etc/teleport
 
-  # teleport:
-  #   image: quay.io/gravitational/teleport:8
-  #   container_name: teleport
-  #   entrypoint: /bin/sh
-  #   hostname: teleport.abrahannevarez.dev
-  #   command: -c "sleep 1 && /bin/dumb-init teleport start -c /etc/teleport/teleport.yaml"
-  #   ports:
-  #     - "3023:3023"
-  #     - "3024:3024"
-  #     - "3025:3025"
-  #     - "3080:3080"
-  #   volumes:
-  #     - ./teleport-config:/etc/teleport
-  #     - ./teleport-data:/var/lib/teleport
-  #   depends_on:
-  #     - configure
-volumes:
-  mongo_storage:
