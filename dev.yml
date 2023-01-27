@@ -3,7 +3,7 @@ version: "3"
 services:
   graphql:
     build:
-      context: ./backend
+      context: ./Portfolio-Backend
       dockerfile: dev.dockerfile
     container_name: graphql
     environment:

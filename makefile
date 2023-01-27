@@ -29,7 +29,7 @@ prod-detached:
 #     Application specific commands #
 #===============================================#
 generate-schema: # Runs generate schema command from go makefile
-	$(MAKE) -C backend/ generate-schema
+	$(MAKE) -C Portfolio-Backend/ generate-schema
 build-tailwind: # Runs generate schema command from go makefile
 	@$(DEV_DOCKER_COMPOSE) exec frontend npm run build:tailwind
 build-fontawesome: # Runs generate schema command from go makefile
