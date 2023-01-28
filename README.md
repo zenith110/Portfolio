@@ -1,2 +1,2 @@
 # site
-Newest version of site, uses graphql, go, mongodb, grafana, and auth0
+Newest version of site, uses graphql, go, and other tech.
