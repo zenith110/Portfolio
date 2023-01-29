@@ -54,6 +54,7 @@ const App = () => {
   if (loading) {
     return <p>Loading Graphql data...</p>
   }
+  console.log(errors)
   // eslint-disable-next-line no-return-assign
   if (errors) return (window.location.href = 'https://status.abrahannevarez.dev')
   const projects = []
