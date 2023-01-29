@@ -7,7 +7,6 @@ const header = {
 const about = {
   // all the properties are optional - can be left empty or deleted
   name: 'Abrahan Nevarez',
-  role: 'Fullstack Engineer',
   description:
     'Hi there. I am currently a full stack engineer dabbling in various technologies. Currently I am learning the Grafana stack: Grafana, Loki, and Tempo. I am also learning Terraform to develop infrastructure. ',
   resume:

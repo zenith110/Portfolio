@@ -6,8 +6,6 @@ import {
   Route
 } from "react-router-dom";
 import App from './App'
-import Blog from "./components/Blog/Blog"
-import Article from "./components/Article/Article"
 import { ThemeProvider } from './contexts/theme'
 import './index.css'
 
@@ -21,8 +19,6 @@ render(
     <ThemeProvider>
        <BrowserRouter>
           <Routes>
-            <Route path="/blog/:title" element={<Article/>}/>
-            <Route path="/blog" element={<Blog />} />
             <Route path="/" element={<App />} />
           </Routes>
       </BrowserRouter>,

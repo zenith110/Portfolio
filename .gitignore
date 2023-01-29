@@ -18,3 +18,4 @@ mongo/
 teleport-config/
 teleport-data/
 zinc/
+*.env

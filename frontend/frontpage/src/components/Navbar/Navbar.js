@@ -55,15 +55,6 @@ const Navbar = ({ projects, skills }) => {
         ) : null}
         <li className='nav__list-item'>
           <a
-            href={process.env.REACT_APP_ADMIN_PANEL}
-            onClick={toggleNavList}
-            className='link link--nav'
-          >
-            Admin Panel
-          </a>
-        </li>
-        <li className='nav__list-item'>
-          <a
             href='https://status.abrahannevarez.dev'
             onClick={toggleNavList}
             className='link link--nav'

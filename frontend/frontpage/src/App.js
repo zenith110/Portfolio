@@ -9,10 +9,11 @@ import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 import Contact from './components/Contact/Contact'
 import Footer from './components/Footer/Footer'
 import './App.css'
+import Learning from "./components/learningNew/Learning"
 
 const App = () => {
   const [{ themeName }] = useContext(ThemeContext)
-  const query = gql`
+  const projectQuery = gql`
     query getProjects {
       githubProjects {
         projects {
@@ -29,17 +30,39 @@ const App = () => {
       }
     }
   `
-  const { loading, error, data } = useQuery(query)
-
+  const bioQuery = gql`
+    query{
+    profile{
+      readme
+      position
+      company
+    }
+  }
+  `
+  const notionQuery = gql`
+    query{
+    notionGoals{
+      goals
+    }
+}
+  `
+  const githubProjectsQuery = useQuery(projectQuery);
+  const githubBioQuery = useQuery(bioQuery);
+  const notionGoalsQuery = useQuery(notionQuery);
+  const errors = githubProjectsQuery.error || githubBioQuery.error || notionGoalsQuery.error
+  const loading = githubProjectsQuery.loading || githubBioQuery.loading || notionGoalsQuery.loading
   if (loading) {
     return <p>Loading Graphql data...</p>
   }
   // eslint-disable-next-line no-return-assign
-  if (error) return (window.location.href = 'https://status.abrahannevarez.dev')
+  if (errors) return (window.location.href = 'https://status.abrahannevarez.dev')
   const projects = []
   const skillsStorage = []
   const topicsStorage = []
-  data.githubProjects.projects.map((projectInfo) =>
+  const bio = githubBioQuery.data.profile;
+  const notionData = notionGoalsQuery.data.notionGoals.goals;
+  const year =  new Date().getFullYear();
+  githubProjectsQuery.data.githubProjects.projects.map((projectInfo) =>
     projects.push({
       name: projectInfo.name,
       description: projectInfo.description,
@@ -49,12 +72,12 @@ const App = () => {
       livePreview: projectInfo.deploymentlink,
     })
   )
-  data.githubProjects.projects.map((projectInfo) =>
+  githubProjectsQuery.data.githubProjects.projects.map((projectInfo) =>
     projectInfo.languages.map((skillsData) =>
       skillsStorage.push(skillsData.language)
     )
   )
-  data.githubProjects.projects.map((projectInfo) =>
+  githubProjectsQuery.data.githubProjects.projects.map((projectInfo) =>
     projectInfo.topics.map((topic) => topicsStorage.push(topic))
   )
 
@@ -86,9 +109,10 @@ const App = () => {
       <Header projects={projects} skills={skills} />
 
       <main>
-        <About />
+        <About bio={bio}/>
         <Projects projects={projects} topics={topics} />
         <Skills skills={skills} />
+        <Learning notionData={notionData} year={year}/>
         <Contact />
       </main>
 

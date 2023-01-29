@@ -26,8 +26,8 @@ services:
     volumes:
       - /app/node_modules
       - ./frontend/frontpage:/home/app/portfolio
-    env_file:
-      - .env
     depends_on:
       - graphql
+    env_file:
+      - .env
 

@@ -3,9 +3,11 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn'
 import { about } from '../../portfolio'
 import './About.css'
 
-const About = () => {
-  const { name, role, description, resume, social } = about
-
+const About = ({ bio }) => {
+  const { name, resume, description, social } = about
+  const {company} = bio;
+  const {readme} = bio
+  const role = bio.position;
   return (
     <div className='about center'>
       {name && (
@@ -14,8 +16,8 @@ const About = () => {
         </h1>
       )}
 
-      {role && <h2 className='about__role'>A {role}.</h2>}
-      <p className='about__desc'>{description && description}</p>
+      {role && <h2 className='about__role'>A {role} at {company}.</h2>}
+      <p className='about__desc'>{readme}</p>
 
       <div className='about__contact center'>
         {resume && (
