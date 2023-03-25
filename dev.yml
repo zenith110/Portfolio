@@ -5,29 +5,27 @@ services:
     build:
       context: ./Portfolio-Backend
       dockerfile: dev.dockerfile
-    container_name: graphql
+    container_name: portfolio-graphql
     environment:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
     ports:
-      - 8443:8443
+      - 8080:8080
     env_file:
       - .env
   portfolio:
     build:
-      context: ./frontend/frontpage
+      context: ./frontend
       dockerfile: dev.dockerfile
-    container_name: portfolio
+    container_name: portfolio-frontend
     environment:
       CHOKIDAR_USEPOLLING: "true"
     restart: unless-stopped
     ports:
-      - "80:3000"
-    volumes:
-      - /app/node_modules
-      - ./frontend/frontpage:/home/app/portfolio
+      - "80:5173"
     depends_on:
       - graphql
     env_file:
       - .env
+
 

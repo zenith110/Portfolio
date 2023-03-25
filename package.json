@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@mui/base": "^5.0.0-alpha.122",
+    "@mui/icons-material": "^5.11.11",
+    "install": "^0.13.0",
+    "npm": "^9.6.2",
+    "vite-plugin-env-compatible": "^1.1.1"
+  }
+}

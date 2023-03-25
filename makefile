@@ -25,6 +25,9 @@ prod-build:
 prod-detached:
 	@echo "Now running in prod enviroment"
 	@$(PROD_DOCKER_COMPOSE) up -d --build
+fetch:
+	@echo "Fetching latest sub-modules!"
+	git submodule update --init --recursive
 #===============================================#
 #     Application specific commands #
 #===============================================#
