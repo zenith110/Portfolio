@@ -64,14 +64,14 @@ const Navbar = ({ projects, skills }) => {
             Status Page
           </a>
         </li>
-        <li className='nav__list-item'>
+        {/* <li className='nav__list-item'>
           <a
             onClick={() => navigate("/blog")}
             className='link link--nav'
           >
             Blog
           </a>
-        </li>
+        </li> */}
       </ul>
       <button
         type='button'
