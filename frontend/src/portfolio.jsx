@@ -8,7 +8,7 @@ const header = {
   const about = {
     name: 'Abrahan Nevarez',
     resume:
-      'https://fetchitbucket.s3.us-east-2.amazonaws.com/Abrahan_Nevarez_Latest_Resume.pdf',
+      'https://assets.abrahannevarez.dev/Abrahan_Nevarez_Latest_Resume.pdf',
     social: {
       linkedin: 'https://www.linkedin.com/in/abrahan-nevarez/',
       github: 'https://github.com/zenith110',

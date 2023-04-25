@@ -32,12 +32,14 @@ const ArticleSearch = ({keyword}) => {
     }
   });
   if (loading) {
-    return <p>Loading Graphql data...</p>
+    return <p></p>
   }
+  
   // eslint-disable-next-line no-return-assign
   if (error) return `Could not load articles! ${error.message}`;
+  console.log(data)
   const articles = []
-  data.articles.article.map((articleData) => {
+  data.articles.articleCollection.map((articleData) => {
     articles.push({
       title: articleData.title,
       titleCard: articleData.titleCard,

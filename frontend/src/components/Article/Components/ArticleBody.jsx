@@ -1,14 +1,13 @@
 /* eslint-disable react/button-has-type */
-import parse from 'html-react-parser';
-
-
+import ReactMarkdown from 'react-markdown'
+import "./ArticleBody.css"
 const ArticleBody = ({data}) => {
     
-    const body = parse(data.article.contentData)
+    const {contentData} = data.article
     return(
         <div>
             <div style={{textAlign: "center"}}>
-                {body}
+            <ReactMarkdown children={contentData} className="foo"/>
             </div>
         </div>
     )

@@ -2,8 +2,10 @@ import Grid from '@mui/material/Grid';
 import ArticleCard from './ArticleCard';
 import "./ArticleSection.css"
 
-const ArticleSection = ({ articles }) => (
+const ArticleSection = ({ articles }) => {
+        return(
         <div >
+          {articles.length > 0 ?
            <Grid
             container
             spacing={5}
@@ -18,7 +20,8 @@ const ArticleSection = ({ articles }) => (
               <ArticleCard article={articleData} key={articleData.uuid} className="ArticleCard"/>
               </Grid>
             ))}
-          </Grid>
+          </Grid> : <></>}
           </div>
     )
-    export default ArticleSection
+}
+export default ArticleSection

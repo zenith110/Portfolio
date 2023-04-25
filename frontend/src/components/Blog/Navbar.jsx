@@ -43,15 +43,7 @@ const Navbar = () => {
         </li>
         <li className='nav__list-item'>
           <a
-            href='https://status.abrahannevarez.dev'
-            onClick={toggleNavList}
-            className='link link--nav'
-          >
-            Status Page
-          </a>
-        </li>
-        <li className='nav__list-item'>
-          <a
+            href={import.meta.env.VITE_BLOG_URL}
             onClick={toggleNavList}
             className='link link--nav'
           >
