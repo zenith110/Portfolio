@@ -1,3 +1,6 @@
 [submodule "Portfolio-Backend"]
 	path = Portfolio-Backend
 	url = https://github.com/zenith110/Portfolio-Backend
+[submodule "v3-portfolio"]
+	path = v3-portfolio
+	url = https://github.com/zenith110/v3-portfolio
